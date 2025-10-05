@@ -1,4 +1,4 @@
-import * as React from 'react';
+
 import {
   Body,
   Container,
@@ -6,14 +6,15 @@ import {
   Heading,
   Hr,
   Html,
-  Link,
   Preview,
   Section,
   Text,
+  Link,
   Tailwind,
 } from '@react-email/components';
+import * as React from 'react';
 
-export interface AdminEmailProps {
+interface EmailProps {
   customerName: string;
   trackingNumber: string;
   copies: number;
@@ -24,7 +25,7 @@ export interface AdminEmailProps {
   phone: string;
 }
 
-const AdminNotificationEmail = ({
+export const AdminNotificationEmail = ({
   customerName,
   trackingNumber,
   copies,
@@ -33,7 +34,7 @@ const AdminNotificationEmail = ({
   receiptUrl,
   email,
   phone,
-}: AdminEmailProps) => (
+}: EmailProps) => (
   <Html>
     <Head />
     <Preview>New Pre-Order Received: {customerName}</Preview>
@@ -54,7 +55,7 @@ const AdminNotificationEmail = ({
             <Text className="text-[14px] leading-[22px] m-0"><strong>Email:</strong> {email}</Text>
             <Text className="text-[14px] leading-[22px] m-0"><strong>Phone:</strong> {phone}</Text>
             <Text className="text-[14px] leading-[22px] m-0"><strong>Copies:</strong> {copies}</Text>
-            <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Shipping Address:</strong><br/>{shippingAddress.split('\n').map((line, i) => <React.Fragment key={i}>{line}<br/></React.Fragment>)}</Text>
+            <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Shipping Address:</strong><br/>{shippingAddress.split('\n').map((line, i) => <span key={i}>{line}<br/></span>)}</Text>
             <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Book Signing Event:</strong> {eventDetails}</Text>
           </Section>
 

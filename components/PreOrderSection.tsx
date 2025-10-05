@@ -1,7 +1,4 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { nanoid } from 'nanoid';
-import { supabase } from '../lib/supabaseBrowserClient';
 
 // Checkmark icon for valid fields
 const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -39,6 +36,12 @@ const PreOrderSection: React.FC = () => {
     const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
+
+    // Environment variables for payment details with fallbacks
+    const bankName = process.env.BANK_NAME || 'Bank of Maldives';
+    const accountHolderName = process.env.ACCOUNT_HOLDER_NAME || 'Mariyam Hawla';
+    const usdAccountNumber = process.env.USD_ACCOUNT_NUMBER || '7770000081709';
+    const mvrAccountNumber = process.env.MVR_ACCOUNT_NUMBER || '7704240648101';
 
     const handleCopy = (account: string) => {
         navigator.clipboard.writeText(account.replace(/\s/g, ''));
@@ -96,6 +99,7 @@ const PreOrderSection: React.FC = () => {
     };
     
     const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        // FIX: The `name` variable was undefined. Using `e.target.name` to get the field name.
         setTouched(prev => ({ ...prev, [e.target.name]: true }));
     };
 
@@ -124,36 +128,17 @@ const PreOrderSection: React.FC = () => {
         if (isLoading || !file) return;
 
         setIsLoading(true);
+        
+        const data = new FormData();
+        Object.keys(formData).forEach(key => {
+            data.append(key, String(formData[key as keyof typeof formData]));
+        });
+        data.append('receipt', file);
 
         try {
-            // Step 1: Upload receipt file directly to Supabase Storage
-            const fileExt = file.name.split('.').pop();
-            const uniqueFileName = `${nanoid()}.${fileExt}`;
-            const filePath = `${uniqueFileName}`; 
-
-            const { error: uploadError } = await supabase.storage
-                .from('receipts')
-                .upload(filePath, file);
-
-            if (uploadError) {
-                throw new Error(`Receipt Upload Failed: ${uploadError.message}`);
-            }
-
-            // Step 2: Get the public URL of the uploaded file
-            const { data: urlData } = supabase.storage
-                .from('receipts')
-                .getPublicUrl(filePath);
-
-            if (!urlData || !urlData.publicUrl) {
-                throw new Error('Could not get the public URL for the uploaded receipt.');
-            }
-            const receiptFileUrl = urlData.publicUrl;
-
-            // Step 3: Send form data (with receipt URL) to the serverless function
             const response = await fetch('/api/submit-order', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formData, receiptFileUrl }),
+                body: data,
             });
 
             const result = await response.json();
@@ -188,9 +173,9 @@ const PreOrderSection: React.FC = () => {
     
     const renderConfirmationMessage = () => (
         <div className="text-center p-8 bg-sand/80 rounded-lg shadow-inner border border-coral/30">
-            <h3 className="font-heading text-3xl font-semibold text-dark-slate mb-4">Thank You! Your Order is Confirmed.</h3>
+            <h3 className="font-heading text-3xl font-semibold text-dark-slate mb-4">Thank You! Your Submission is Received.</h3>
             <p className="text-dark-slate/80 mb-6">
-                Your pre-order has been successfully submitted. We've sent a detailed confirmation to your email address.
+                We've received your pre-order submission and are now verifying your payment details. You will receive a separate, official confirmation email once your order is approved.
             </p>
             <div className="bg-white/70 p-4 rounded-lg border border-coral/20 max-w-md mx-auto">
                 <p className="text-sm font-semibold text-dark-slate/90">Your Order Tracking Number:</p>
@@ -199,7 +184,7 @@ const PreOrderSection: React.FC = () => {
             </div>
             {formData.joinEvent && (
                 <p className="text-dark-slate/80 font-semibold mt-6">
-                    {`We have also reserved your spot ${formData.bringGuest ? "(+1 guest) " : ""}for the exclusive book signing event!`}
+                    {`We have also provisionally reserved your spot ${formData.bringGuest ? "(+1 guest) " : ""}for the exclusive book signing event, pending confirmation!`}
                 </p>
             )}
             <button
@@ -251,15 +236,15 @@ const PreOrderSection: React.FC = () => {
                             </div>
                             <p className="text-dark-slate/80 mb-4">Please transfer to one of the accounts below and save a digital copy of your receipt.</p>
                             <div className="p-4 bg-white/60 rounded-md space-y-3 text-sm text-dark-slate/90 border border-coral/20">
-                                <p><span className="font-semibold">Bank:</span> Bank of Maldives</p>
-                                <p><span className="font-semibold">Account Name:</span> Mariyam Hawla</p>
+                                <p><span className="font-semibold">Bank:</span> {bankName}</p>
+                                <p><span className="font-semibold">Account Name:</span> {accountHolderName}</p>
                                 <div className="flex items-center justify-between">
-                                    <p>USD Account: <span className="font-mono bg-white/90 px-2 py-1 rounded select-all">7770000081709</span></p>
-                                    <CopyButton text="7770000081709" />
+                                    <p>USD Account: <span className="font-mono bg-white/90 px-2 py-1 rounded select-all">{usdAccountNumber}</span></p>
+                                    <CopyButton text={usdAccountNumber} />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <p>MVR Account: <span className="font-mono bg-white/90 px-2 py-1 rounded select-all">7704240648101</span></p>
-                                    <CopyButton text="7704240648101" />
+                                    <p>MVR Account: <span className="font-mono bg-white/90 px-2 py-1 rounded select-all">{mvrAccountNumber}</span></p>
+                                    <CopyButton text={mvrAccountNumber} />
                                 </div>
                             </div>
                         </div>

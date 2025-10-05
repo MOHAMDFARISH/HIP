@@ -1,4 +1,4 @@
-import * as React from 'react';
+
 import {
   Body,
   Container,
@@ -12,8 +12,9 @@ import {
   Text,
   Tailwind,
 } from '@react-email/components';
+import * as React from 'react';
 
-export interface CustomerEmailProps {
+interface EmailProps {
   customerName: string;
   trackingNumber: string;
   copies: number;
@@ -21,16 +22,18 @@ export interface CustomerEmailProps {
   eventDetails: string;
 }
 
-const CustomerConfirmationEmail = ({
+const baseUrl = 'https://www.healinparadise.com'; // Replace with your live URL
+
+export const CustomerConfirmationEmail = ({
   customerName,
   trackingNumber,
   copies,
   shippingAddress,
   eventDetails
-}: CustomerEmailProps) => (
+}: EmailProps) => (
   <Html>
     <Head />
-    <Preview>Your 'Heal in Paradise' Pre-Order is Confirmed!</Preview>
+    <Preview>Your 'Heal in Paradise' pre-order submission has been received.</Preview>
     <Tailwind>
       <Body className="bg-sand my-auto mx-auto font-sans">
         <Container className="border border-solid border-coral/30 rounded my-[40px] mx-auto p-[20px] max-w-[600px] bg-white">
@@ -43,28 +46,31 @@ const CustomerConfirmationEmail = ({
               className="my-0 mx-auto"
             />
             <Heading className="text-dark-slate text-[28px] font-bold font-heading p-0 my-[30px] mx-0">
-              Thank You For Your Order!
+              Your Pre-Order Submission is Received
             </Heading>
           </Section>
           <Text className="text-dark-slate text-[16px] leading-[24px]">
             Dear {customerName},
           </Text>
           <Text className="text-dark-slate text-[16px] leading-[24px]">
-            We are overjoyed to confirm your pre-order for 'Heal in Paradise'! You've secured your copy of the first Maldivian literary souvenir, and we can't wait for you to experience this journey of hope and healing.
+            Thank you for submitting your pre-order for 'Heal in Paradise'. This email is to confirm we have successfully received your submission.
+          </Text>
+           <Text className="text-dark-slate text-[16px] leading-[24px]">
+            <strong>Please note: This is not your final order confirmation.</strong> Our team is now verifying your payment details. Once your payment is confirmed, you will receive a separate email officially confirming your order and its details.
           </Text>
 
           <Section className="bg-sand/50 border border-solid border-coral/20 rounded-lg p-5 my-5">
             <Heading as="h2" className="text-dark-slate text-[20px] font-semibold font-heading m-0 mb-4">
-              Your Order Summary
+              Your Submission Summary
             </Heading>
             <Text className="text-[14px] leading-[22px] m-0"><strong>Tracking Number:</strong> <span className="font-mono text-coral">{trackingNumber}</span></Text>
             <Text className="text-[14px] leading-[22px] m-0"><strong>Copies:</strong> {copies}</Text>
-            <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Shipping Address:</strong><br/>{shippingAddress.split('\n').map((line, i) => <React.Fragment key={i}>{line}<br/></React.Fragment>)}</Text>
+            <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Shipping Address:</strong><br/>{shippingAddress.split('\n').map((line, i) => <span key={i}>{line}<br/></span>)}</Text>
              <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Book Signing Event (Oct 28):</strong> {eventDetails}</Text>
           </Section>
           
           <Text className="text-dark-slate text-[16px] leading-[24px]">
-            You can use your tracking number on our website to check the status of your order at any time. Please note that deliveries will commence after the official book launch on October 28th, 2025.
+            You can use your tracking number on our website to check the status of your submission. Please note that deliveries will commence after the official book launch on October 28th, 2025.
           </Text>
           
           <Hr className="border border-solid border-coral/20 my-[26px] mx-0 w-full" />

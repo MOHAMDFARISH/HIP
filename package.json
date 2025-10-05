@@ -1,5 +1,5 @@
 {
-  "name": "deployment-ready-copy-of-heal-in-paradise---hawla-riza",
+  "name": "deployment-copy-of-heal-in-paradise---hawla-riza",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,10 +14,7 @@
     "@supabase/supabase-js": "^2.58.0",
     "nanoid": "^5.1.6",
     "resend": "^6.1.2",
-    "@react-email/components": "^0.5.5",
-    "vite": "^7.1.9",
-    "@vitejs/plugin-react": "^5.0.4",
-    "path": "^0.12.7"
+    "@react-email/components": "^0.5.5"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

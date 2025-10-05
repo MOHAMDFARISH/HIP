@@ -10,13 +10,16 @@ export default defineConfig(({ mode }) => {
         host: '0.0.0.0',
       },
       plugins: [react()],
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
+      // FIX: Removed the `define` block. Vite automatically exposes variables
+      // prefixed with `VITE_` on `import.meta.env` in a type-safe way. The `define`
+      // option is a legacy method that can interfere with TypeScript's type inference,
+      // causing the "Property 'env' does not exist on type 'ImportMeta'" error.
       resolve: {
+        // FIX: Replaced `__dirname` which is not available in ES modules with
+        // `process.cwd()`. This correctly resolves the alias to the project root
+        // in an ESM-compatible manner.
         alias: {
-          '@': path.resolve(__dirname, '.'),
+          '@': path.resolve(process.cwd()),
         }
       }
     };

@@ -1,42 +1,75 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ErrorInfo, ReactNode } from 'react';
 
-interface Props {
-  children?: ReactNode;
+interface ErrorBoundaryProps {
+  children: ReactNode;
 }
 
 interface State {
   hasError: boolean;
 }
 
-class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false
-  };
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, State> {
+  // FIX: Replaced the class property state initializer with a constructor to
+  // explicitly pass props to the super class and initialize state. This ensures
+  // the component's `this` context is correctly typed and resolves the error
+  // where `this.props` was not found.
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
-  public static getDerivedStateFromError(_: Error): State {
+  static getDerivedStateFromError(_: Error): State {
     // Update state so the next render will show the fallback UI.
     return { hasError: true };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // You can also log the error to an error reporting service
     console.error("Uncaught error:", error, errorInfo);
   }
 
-  public render() {
+  handleReturnHome = () => {
+    // A full page reload is the most robust way to reset the application's state.
+    window.location.href = '/';
+  };
+
+  render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
+      // Custom fallback UI
       return (
-        <div className="min-h-screen flex items-center justify-center bg-sand">
-          <div className="text-center p-8 bg-white rounded-lg shadow-lg">
-            <h1 className="text-2xl font-bold text-dark-slate mb-4">Something went wrong.</h1>
-            <p className="text-dark-slate/80 mb-6">We're sorry for the inconvenience. Please try refreshing the page.</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-coral text-white font-bold py-2 px-6 rounded-md shadow-lg hover:bg-opacity-90 transition-all duration-300"
-            >
-              Refresh Page
-            </button>
+        <div 
+            className="min-h-screen flex items-center justify-center p-4"
+            style={{
+                backgroundImage: "url('https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1920/v1758364608/Gemini_Generated_Image_xka36nxka36nxka3_rodtiq.png')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundAttachment: 'fixed'
+            }}
+        >
+          <div 
+            className="max-w-2xl w-full text-center p-8 md:p-12 rounded-lg shadow-xl ring-1 ring-black ring-opacity-5"
+            style={{
+              backgroundImage: "url('https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1920/v1758431623/Gemini_Generated_Image_ufm4haufm4haufm4_udkrj9.png')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          >
+            <div className="bg-white/80 backdrop-blur-sm p-8 rounded-md">
+                <svg className="w-16 h-16 text-coral mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h1 className="text-3xl md:text-4xl font-bold font-heading text-dark-slate mb-4">A Wave Washed Over Us...</h1>
+                <p className="text-dark-slate/80 mb-8 leading-relaxed">
+                    It seems we've encountered an unexpected swell. Please return to the calm shores of our homepage to start fresh.
+                </p>
+                <button
+                    onClick={this.handleReturnHome}
+                    aria-label="Return to Home Page"
+                    className="bg-coral text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 ease-in-out"
+                >
+                    Return to Home
+                </button>
+            </div>
           </div>
         </div>
       );

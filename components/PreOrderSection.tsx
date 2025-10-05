@@ -1,4 +1,7 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { nanoid } from 'nanoid';
+import { supabase } from '../lib/supabaseBrowserClient';
 
 // Checkmark icon for valid fields
 const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -93,7 +96,6 @@ const PreOrderSection: React.FC = () => {
     };
     
     const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        // FIX: The `name` variable was undefined. Using `e.target.name` to get the field name.
         setTouched(prev => ({ ...prev, [e.target.name]: true }));
     };
 
@@ -122,17 +124,36 @@ const PreOrderSection: React.FC = () => {
         if (isLoading || !file) return;
 
         setIsLoading(true);
-        
-        const data = new FormData();
-        Object.keys(formData).forEach(key => {
-            data.append(key, String(formData[key as keyof typeof formData]));
-        });
-        data.append('receipt', file);
 
         try {
+            // Step 1: Upload receipt file directly to Supabase Storage
+            const fileExt = file.name.split('.').pop();
+            const uniqueFileName = `${nanoid()}.${fileExt}`;
+            const filePath = `${uniqueFileName}`; 
+
+            const { error: uploadError } = await supabase.storage
+                .from('receipts')
+                .upload(filePath, file);
+
+            if (uploadError) {
+                throw new Error(`Receipt Upload Failed: ${uploadError.message}`);
+            }
+
+            // Step 2: Get the public URL of the uploaded file
+            const { data: urlData } = supabase.storage
+                .from('receipts')
+                .getPublicUrl(filePath);
+
+            if (!urlData || !urlData.publicUrl) {
+                throw new Error('Could not get the public URL for the uploaded receipt.');
+            }
+            const receiptFileUrl = urlData.publicUrl;
+
+            // Step 3: Send form data (with receipt URL) to the serverless function
             const response = await fetch('/api/submit-order', {
                 method: 'POST',
-                body: data,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...formData, receiptFileUrl }),
             });
 
             const result = await response.json();

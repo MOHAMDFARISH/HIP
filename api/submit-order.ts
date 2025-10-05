@@ -4,7 +4,8 @@ import { nanoid } from 'nanoid';
 import CustomerConfirmationEmail from '../emails/CustomerConfirmationEmail';
 import AdminNotificationEmail from '../emails/AdminNotificationEmail';
 
-// This is a serverless function, so we can safely use environment variables
+// --- SERVERLESS FUNCTION LOGIC ---
+
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
 const resendApiKey = process.env.RESEND_API_KEY!;

@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import { createClient } from '@supabase/supabase-js';
 
 // This file is for client-side use. It uses Vite's standard environment

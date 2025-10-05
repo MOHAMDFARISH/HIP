@@ -1,4 +1,4 @@
-
+import * as React from 'react';
 import {
   Body,
   Container,
@@ -12,9 +12,8 @@ import {
   Text,
   Tailwind,
 } from '@react-email/components';
-import * as React from 'react';
 
-interface EmailProps {
+export interface CustomerEmailProps {
   customerName: string;
   trackingNumber: string;
   copies: number;
@@ -22,15 +21,13 @@ interface EmailProps {
   eventDetails: string;
 }
 
-const baseUrl = 'https://www.healinparadise.com'; // Replace with your live URL
-
-export const CustomerConfirmationEmail = ({
+const CustomerConfirmationEmail = ({
   customerName,
   trackingNumber,
   copies,
   shippingAddress,
   eventDetails
-}: EmailProps) => (
+}: CustomerEmailProps) => (
   <Html>
     <Head />
     <Preview>Your 'Heal in Paradise' Pre-Order is Confirmed!</Preview>
@@ -62,7 +59,7 @@ export const CustomerConfirmationEmail = ({
             </Heading>
             <Text className="text-[14px] leading-[22px] m-0"><strong>Tracking Number:</strong> <span className="font-mono text-coral">{trackingNumber}</span></Text>
             <Text className="text-[14px] leading-[22px] m-0"><strong>Copies:</strong> {copies}</Text>
-            <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Shipping Address:</strong><br/>{shippingAddress.split('\n').map((line, i) => <span key={i}>{line}<br/></span>)}</Text>
+            <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Shipping Address:</strong><br/>{shippingAddress.split('\n').map((line, i) => <React.Fragment key={i}>{line}<br/></React.Fragment>)}</Text>
              <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Book Signing Event (Oct 28):</strong> {eventDetails}</Text>
           </Section>
           

@@ -9,8 +9,11 @@ interface State {
 }
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, State> {
-  // FIX: Initialized state as a class property to resolve TypeScript errors with `this.state` and `this.props`.
-  state: State = { hasError: false };
+  // FIX: Replaced state initialization as a class property with a constructor to ensure `this.props` is correctly initialized, which resolves the TypeScript error.
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
   static getDerivedStateFromError(_: Error): State {
     // Update state so the next render will show the fallback UI.

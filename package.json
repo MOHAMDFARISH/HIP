@@ -12,8 +12,8 @@
     "react-dom": "^19.1.1",
     "react": "^19.1.1",
     "@supabase/supabase-js": "^2.58.0",
-    "nanoid": "^5.1.6",
-    "resend": "^6.1.2"
+    "resend": "^6.1.2",
+    "nanoid": "^5.1.6"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

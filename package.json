@@ -13,8 +13,7 @@
     "react": "^19.1.1",
     "@supabase/supabase-js": "^2.58.0",
     "nanoid": "^5.1.6",
-    "resend": "^6.1.2",
-    "@react-email/components": "^0.5.5"
+    "resend": "^6.1.2"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

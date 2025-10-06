@@ -1,9 +1,12 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { nanoid } from 'nanoid';
-import CustomerConfirmationEmail from '../emails/CustomerConfirmationEmail';
-import AdminNotificationEmail from '../emails/AdminNotificationEmail';
+// FIX: The original file had email components with JSX defined directly inside this .ts file,
+// causing numerous parsing and scope errors. The components have been moved to their
+// own .tsx files and are now imported.
+import { CustomerConfirmationEmail } from '../emails/CustomerConfirmationEmail';
+import { AdminNotificationEmail } from '../emails/AdminNotificationEmail';
+import * as React from 'react';
 
 // This is a serverless function, so we can safely use environment variables
 const supabaseUrl = process.env.SUPABASE_URL!;

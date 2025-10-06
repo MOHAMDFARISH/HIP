@@ -1,12 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { nanoid } from 'nanoid';
-// FIX: The original file had email components with JSX defined directly inside this .ts file,
-// causing numerous parsing and scope errors. The components have been moved to their
-// own .tsx files and are now imported.
+import * as React from 'react';
+// FIX: Removed redundant inlined email components.
+// Importing from dedicated .tsx files resolves parsing errors and removes code duplication.
 import { CustomerConfirmationEmail } from '../emails/CustomerConfirmationEmail';
 import { AdminNotificationEmail } from '../emails/AdminNotificationEmail';
-import * as React from 'react';
+
+
+// --- Main Serverless Function Handler ---
 
 // This is a serverless function, so we can safely use environment variables
 const supabaseUrl = process.env.SUPABASE_URL!;
@@ -93,7 +95,8 @@ export default async (req: Request) => {
             from: `Heal in Paradise <orders@healinparadise.com>`, // Use a verified domain
             to: orderData.email,
             subject: `Submission Received for 'Heal in Paradise' Pre-Order #${trackingNumber}`,
-            react: CustomerConfirmationEmail(commonEmailProps),
+            // FIX: Use React.createElement to construct the email component without using JSX syntax in a .ts file.
+            react: React.createElement(CustomerConfirmationEmail, commonEmailProps),
         });
 
         // To Admin
@@ -101,7 +104,8 @@ export default async (req: Request) => {
             from: `New Pre-Order <system@healinparadise.com>`,
             to: adminEmail,
             subject: `New Pre-Order Received: ${orderData.fullName} (#${trackingNumber})`,
-            react: AdminNotificationEmail({ ...commonEmailProps, receiptUrl: receiptFileUrl, email: orderData.email, phone: orderData.phone }),
+            // FIX: Use React.createElement to construct the email component without using JSX syntax in a .ts file.
+            react: React.createElement(AdminNotificationEmail, { ...commonEmailProps, receiptUrl: receiptFileUrl, email: orderData.email, phone: orderData.phone }),
         });
 
         return new Response(JSON.stringify({ success: true, trackingNumber }), { status: 200 });

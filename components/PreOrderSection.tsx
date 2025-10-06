@@ -136,7 +136,7 @@ const PreOrderSection: React.FC = () => {
         data.append('receipt', file);
 
         try {
-            const response = await fetch('/api/submit-order', {
+            const response = await fetch('/api/submit-pre-order', {
                 method: 'POST',
                 body: data,
             });

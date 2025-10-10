@@ -13,33 +13,71 @@ interface OrderData {
     bring_guest: boolean;
 }
 
-interface OrderTrackingSectionProps {
-    initialInfo: { trackingNumber: string; email: string } | null;
-    setInitialInfo: (info: null) => void;
-}
-
-const StatusIndicator: React.FC<{ status: string }> = ({ status }) => {
-    const statusText = status.replace(/_/g, ' ');
-    const statusStyles: { [key: string]: { text: string, bg: string, dot: string } } = {
-        pending_payment: { text: 'text-orange-800', bg: 'bg-orange-100', dot: 'bg-orange-500' },
-        pending: { text: 'text-yellow-800', bg: 'bg-yellow-100', dot: 'bg-yellow-500' },
-        processing: { text: 'text-blue-800', bg: 'bg-blue-100', dot: 'bg-blue-500' },
-        shipped: { text: 'text-green-800', bg: 'bg-green-100', dot: 'bg-green-500' },
-        delivered: { text: 'text-emerald-800', bg: 'bg-emerald-100', dot: 'bg-emerald-500' },
-        cancelled: { text: 'text-red-800', bg: 'bg-red-100', dot: 'bg-red-500' },
+const getStatusMessage = (status: string) => {
+    const messages: { [key: string]: { title: string; message: string; color: string; } } = {
+        pending_payment: {
+            title: '⏳ Payment Pending',
+            message: 'Please make payment and upload your receipt below.',
+            color: 'orange'
+        },
+        pending: {
+            title: '🔍 Under Review',
+            message: 'We\'re verifying your payment receipt. You\'ll receive confirmation within 24 hours.',
+            color: 'yellow'
+        },
+        confirmed: {
+            title: '✅ Order Confirmed',
+            message: 'Your payment is verified! We\'ll notify you when your book ships.',
+            color: 'blue'
+        },
+        shipped: {
+            title: '📦 Shipped',
+            message: 'Your book is on the way! Delivery starts after October 28, 2025.',
+            color: 'purple'
+        },
+        delivered: {
+            title: '🎉 Delivered',
+            message: 'Order complete! Enjoy your book and thank you for your support.',
+            color: 'green'
+        },
+        cancelled: {
+            title: '❌ Order Cancelled',
+            message: 'This order has been cancelled. Please contact us if you have any questions.',
+            color: 'red'
+        },
     };
 
-    const style = statusStyles[status.toLowerCase()] || statusStyles.pending;
+    const statusKey = status.toLowerCase();
+    // Handle 'processing' as a legacy alias for 'confirmed'
+    if (statusKey === 'processing') return messages.confirmed;
+    
+    return messages[statusKey] || messages.pending;
+};
+
+const OrderStatusDisplay: React.FC<{ status: string }> = ({ status }) => {
+    const { title, message, color } = getStatusMessage(status);
+
+    const colorClasses: { [key: string]: { bg: string, border: string, text: string } } = {
+        orange: { bg: 'bg-orange-100', border: 'border-orange-300', text: 'text-orange-800' },
+        yellow: { bg: 'bg-yellow-100', border: 'border-yellow-300', text: 'text-yellow-800' },
+        blue: { bg: 'bg-blue-100', border: 'border-blue-300', text: 'text-blue-800' },
+        purple: { bg: 'bg-purple-100', border: 'border-purple-300', text: 'text-purple-800' },
+        green: { bg: 'bg-green-100', border: 'border-green-300', text: 'text-green-800' },
+        red: { bg: 'bg-red-100', border: 'border-red-300', text: 'text-red-800' },
+    };
+
+    const styles = colorClasses[color] || colorClasses.yellow;
 
     return (
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${style.text} ${style.bg}`}>
-            <span className={`w-2 h-2 mr-2 rounded-full ${style.dot}`}></span>
-            {statusText.charAt(0).toUpperCase() + statusText.slice(1)}
-        </span>
+        <div className={`p-4 rounded-lg border ${styles.bg} ${styles.border}`}>
+            <h4 className={`text-lg font-bold font-heading ${styles.text}`}>{title}</h4>
+            <p className={`text-sm ${styles.text} mt-1`}>{message}</p>
+        </div>
     );
 };
 
-const OrderTrackingSection: React.FC<OrderTrackingSectionProps> = ({ initialInfo, setInitialInfo }) => {
+
+const OrderTrackingSection: React.FC = () => {
     const [trackingNumber, setTrackingNumber] = useState('');
     const [email, setEmail] = useState('');
     const [orderData, setOrderData] = useState<OrderData | null>(null);
@@ -81,16 +119,6 @@ const OrderTrackingSection: React.FC<OrderTrackingSectionProps> = ({ initialInfo
             setIsLoading(false);
         }
     };
-
-    useEffect(() => {
-        if (initialInfo) {
-            setTrackingNumber(initialInfo.trackingNumber);
-            setEmail(initialInfo.email);
-            handleSearchSubmit(initialInfo.trackingNumber, initialInfo.email);
-            setInitialInfo(null); // Clear after use
-        }
-    }, [initialInfo, setInitialInfo]);
-
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
@@ -154,10 +182,12 @@ const OrderTrackingSection: React.FC<OrderTrackingSectionProps> = ({ initialInfo
             if (orderData.status === 'pending_payment') {
                 return (
                     <>
-                        <div className="mt-12 bg-sand/80 p-8 rounded-lg shadow-inner border border-coral/30 text-center">
-                            <h3 className="font-heading text-2xl font-semibold text-dark-slate mb-2">Order Confirmed!</h3>
-                             <p className="text-dark-slate/80 mb-4">Your order details are saved. Please complete payment to finalize.</p>
-                             <p><span className="font-semibold">Tracking Number:</span> <span className="font-mono text-coral">{orderData.tracking_number}</span></p>
+                        <div className="mt-12">
+                            <OrderStatusDisplay status={orderData.status} />
+                        </div>
+                        <div className="mt-6 bg-sand/80 p-6 rounded-lg shadow-inner border border-coral/30 text-center">
+                            <p><span className="font-semibold">Your Tracking Number:</span> <span className="font-mono text-coral">{orderData.tracking_number}</span></p>
+                            <p className="text-sm text-dark-slate/70 mt-2">Keep this for your records. You'll need it to track your order.</p>
                         </div>
                         <PaymentDetails
                             title={<><span className="text-coral">Step 2:</span> Make Your Payment</>}
@@ -196,15 +226,16 @@ const OrderTrackingSection: React.FC<OrderTrackingSectionProps> = ({ initialInfo
             // DEFAULT VIEW FOR OTHER STATUSES
             return (
                 <div className="mt-12 bg-sand/80 p-8 rounded-lg shadow-inner border border-coral/30">
-                    <h3 className="font-heading text-2xl font-semibold text-dark-slate mb-6">Order Details</h3>
-                    <div className="space-y-4 text-dark-slate/90">
-                        <div className="flex justify-between items-center"><span className="font-semibold">Status:</span><StatusIndicator status={orderData.status} /></div>
-                        <hr className="border-coral/20" />
-                        <div className="flex justify-between items-center"><span className="font-semibold">Tracking Number:</span><span className="font-mono text-coral">{orderData.tracking_number}</span></div>
-                        <div className="flex justify-between items-center"><span className="font-semibold">Order Placed:</span><span>{new Date(orderData.created_at).toLocaleDateString()}</span></div>
-                        <div className="flex justify-between items-center"><span className="font-semibold">Copies Ordered:</span><span>{orderData.number_of_copies}</span></div>
-                        <div className="flex flex-col text-left"><span className="font-semibold mb-1">Shipping To:</span><p className="text-sm leading-tight whitespace-pre-line">{orderData.customer_name}<br />{orderData.shipping_address}</p></div>
-                        {orderData.join_event && (<div className="flex justify-between items-center pt-2"><span className="font-semibold">Book Signing Event:</span><span>Registered {orderData.bring_guest ? '(+1 Guest)' : ''}</span></div>)}
+                    <OrderStatusDisplay status={orderData.status} />
+                    <div className="mt-6 pt-6 border-t border-coral/20">
+                        <h3 className="font-heading text-2xl font-semibold text-dark-slate mb-6">Order Summary</h3>
+                        <div className="space-y-4 text-dark-slate/90">
+                            <div className="flex justify-between items-center"><span className="font-semibold">Tracking Number:</span><span className="font-mono text-coral">{orderData.tracking_number}</span></div>
+                            <div className="flex justify-between items-center"><span className="font-semibold">Order Placed:</span><span>{new Date(orderData.created_at).toLocaleDateString()}</span></div>
+                            <div className="flex justify-between items-center"><span className="font-semibold">Copies Ordered:</span><span>{orderData.number_of_copies}</span></div>
+                            <div className="flex flex-col text-left"><span className="font-semibold mb-1">Shipping To:</span><p className="text-sm leading-tight whitespace-pre-line">{orderData.customer_name}<br />{orderData.shipping_address}</p></div>
+                            {orderData.join_event && (<div className="flex justify-between items-center pt-2"><span className="font-semibold">Book Signing Event:</span><span>Registered {orderData.bring_guest ? '(+1 Guest)' : ''}</span></div>)}
+                        </div>
                     </div>
                     <div className="mt-8 pt-6 border-t border-coral/30">
                         <h4 className="font-heading text-xl font-semibold text-dark-slate mb-4 text-center">Estimated Timeline</h4>

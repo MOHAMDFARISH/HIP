@@ -17,12 +17,7 @@ const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-interface PreOrderSectionProps {
-  onOrderSubmitSuccess: (trackingNumber: string, email: string) => void;
-}
-
-
-const PreOrderSection: React.FC<PreOrderSectionProps> = ({ onOrderSubmitSuccess }) => {
+const PreOrderSection: React.FC = () => {
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -36,6 +31,7 @@ const PreOrderSection: React.FC<PreOrderSectionProps> = ({ onOrderSubmitSuccess 
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+    const [orderSubmitted, setOrderSubmitted] = useState(false);
    
     const validate = useCallback(() => {
         const newErrors: { [key: string]: string } = {};
@@ -103,8 +99,8 @@ const PreOrderSection: React.FC<PreOrderSectionProps> = ({ onOrderSubmitSuccess 
                 throw new Error(result.message || 'Something went wrong. Please try again.');
             }
             
-            // Redirect to tracking page via App component
-            onOrderSubmitSuccess(result.trackingNumber, formData.email);
+            setOrderSubmitted(true);
+            window.scrollTo(0, 0);
 
         } catch (error: any) {
             setSubmitError(error.message);
@@ -126,111 +122,125 @@ const PreOrderSection: React.FC<PreOrderSectionProps> = ({ onOrderSubmitSuccess 
                         backgroundPosition: 'center',
                     }}
                 >
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Pre-Order 'Heal in Paradise'</h2>
-                        <p className="mt-4 text-lg text-dark-slate/70 max-w-3xl mx-auto">
-                           Step 1: Fill in your details below. You'll be redirected to upload your receipt after submission.
-                        </p>
-                    </div>
-
-                    <div className="max-w-3xl mx-auto">
-                        <PaymentDetails
-                            title="Payment Information"
-                            description="After submitting your details, you will be redirected to upload your payment receipt. Please use the account details below for the transfer."
-                        />
-
-                        <div className="p-6 rounded-lg bg-white/60 border border-coral/30 mt-12">
-                            <h3 className="font-heading text-2xl font-semibold text-dark-slate mb-6">
-                               <span className="text-coral">Enter Your Details</span>
-                            </h3>
-                            <form onSubmit={handleSubmit} className="space-y-8" noValidate>
-                                <fieldset className="space-y-4">
-                                    <legend className="font-heading text-lg font-semibold text-dark-slate/90 mb-2">Contact & Shipping</legend>
-                                    <div>
-                                        <label htmlFor="fullName" className="block text-sm font-medium text-dark-slate">Full Name</label>
-                                        <div className="relative mt-1">
-                                            <input type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} onBlur={handleBlur} required className={`block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.fullName && errors.fullName ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`} />
-                                            {touched.fullName && !errors.fullName && formData.fullName && <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><CheckIcon /></div>}
-                                        </div>
-                                        {touched.fullName && errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
-                                    </div>
-                                    <div className="grid sm:grid-cols-2 gap-4">
-                                        <div>
-                                            <label htmlFor="email" className="block text-sm font-medium text-dark-slate">Email Address</label>
-                                             <div className="relative mt-1">
-                                                <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} required className={`block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.email && errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`} />
-                                                {touched.email && !errors.email && formData.email && <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><CheckIcon /></div>}
-                                            </div>
-                                            {touched.email && errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-                                        </div>
-                                        <div>
-                                            <label htmlFor="phone" className="block text-sm font-medium text-dark-slate">Phone Number</label>
-                                            <div className="relative mt-1">
-                                                <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} onBlur={handleBlur} required className={`block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.phone && errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`} />
-                                                {touched.phone && !errors.phone && formData.phone && <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><CheckIcon /></div>}
-                                            </div>
-                                            {touched.phone && errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="shippingAddress" className="block text-sm font-medium text-dark-slate">Shipping Address</label>
-                                        <textarea id="shippingAddress" name="shippingAddress" rows={3} value={formData.shippingAddress} onChange={handleChange} onBlur={handleBlur} required className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.shippingAddress && errors.shippingAddress ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`}></textarea>
-                                        {touched.shippingAddress && errors.shippingAddress && <p className="mt-1 text-sm text-red-600">{errors.shippingAddress}</p>}
-                                    </div>
-                                </fieldset>
-
-                                <fieldset className="space-y-4">
-                                    <legend className="font-heading text-lg font-semibold text-dark-slate/90 mb-2">Order Details</legend>
-                                    <div>
-                                        <label htmlFor="copies" className="block text-sm font-medium text-dark-slate">Number of Copies</label>
-                                        <input type="number" id="copies" name="copies" min="1" value={formData.copies} onChange={handleChange} onBlur={handleBlur} required className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.copies && errors.copies ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`} />
-                                        {touched.copies && errors.copies && <p className="mt-1 text-sm text-red-600">{errors.copies}</p>}
-                                    </div>
-                                </fieldset>
-                                
-                                <fieldset className="p-4 border border-coral/30 rounded-lg bg-sand/50 space-y-4">
-                                    <div className="font-heading text-lg font-semibold text-dark-slate/90">Exclusive Book Signing (OCT 28, 2025)</div>
-                                    <div className="flex items-start">
-                                        <input id="joinEvent" name="joinEvent" type="checkbox" checked={formData.joinEvent} onChange={handleChange} className="h-4 w-4 text-coral border-gray-300 rounded focus:ring-coral mt-1" />
-                                        <label htmlFor="joinEvent" className="ml-3 block text-sm font-medium text-dark-slate">Yes! I want to join the book signing event.</label>
-                                    </div>
-                                    {formData.joinEvent && (
-                                        <div className="pl-7 space-y-4 transition-all duration-300 ease-in-out">
-                                            <div className="flex items-start">
-                                                <input id="bringGuest" name="bringGuest" type="checkbox" checked={formData.bringGuest} onChange={handleChange} className="h-4 w-4 text-coral border-gray-300 rounded focus:ring-coral mt-1" />
-                                                <label htmlFor="bringGuest" className="ml-3 block text-sm text-dark-slate">I'd like to bring a guest (+1).</label>
-                                            </div>
-                                        </div>
-                                    )}
-                                </fieldset>
-                                
-                                <div>
-                                    {submitError && (
-                                        <div className="my-4 text-center p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
-                                            <p><strong>Submission Failed:</strong> {submitError}</p>
-                                        </div>
-                                    )}
-                                    <button
-                                        type="submit"
-                                        disabled={isLoading || isFormInvalid}
-                                        className="w-full bg-coral text-white font-bold py-3 px-8 rounded-md text-lg shadow-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 ease-in-out flex justify-center items-center disabled:opacity-75 disabled:cursor-not-allowed disabled:hover:scale-100"
-                                    >
-                                        {isLoading ? (
-                                            <>
-                                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                Confirming...
-                                            </>
-                                        ) : (
-                                            'Confirm Order Details'
-                                        )}
-                                    </button>
-                                </div>
-                            </form>
+                    {orderSubmitted ? (
+                        <div className="text-center py-20">
+                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Submission Received!</h2>
+                            <p className="mt-4 text-lg text-dark-slate/70 max-w-2xl mx-auto">
+                                Thank you for your interest! We've saved your details.
+                            </p>
+                            <p className="mt-2 text-lg text-dark-slate/70 max-w-2xl mx-auto">
+                                Please check your email for a link to complete your payment and finalize your pre-order.
+                            </p>
                         </div>
-                    </div>
+                    ) : (
+                    <>
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Pre-Order 'Heal in Paradise'</h2>
+                            <p className="mt-4 text-lg text-dark-slate/70 max-w-3xl mx-auto">
+                                Step 1: Fill in your details below. You'll receive an email with a link to complete payment after submission.
+                            </p>
+                        </div>
+
+                        <div className="max-w-3xl mx-auto">
+                            <PaymentDetails
+                                title="Payment Information"
+                                description="You will use the account details below on the next step, after submitting your information."
+                            />
+
+                            <div className="p-6 rounded-lg bg-white/60 border border-coral/30 mt-12">
+                                <h3 className="font-heading text-2xl font-semibold text-dark-slate mb-6">
+                                <span className="text-coral">Enter Your Details</span>
+                                </h3>
+                                <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+                                    <fieldset className="space-y-4">
+                                        <legend className="font-heading text-lg font-semibold text-dark-slate/90 mb-2">Contact & Shipping</legend>
+                                        <div>
+                                            <label htmlFor="fullName" className="block text-sm font-medium text-dark-slate">Full Name</label>
+                                            <div className="relative mt-1">
+                                                <input type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} onBlur={handleBlur} required className={`block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.fullName && errors.fullName ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`} />
+                                                {touched.fullName && !errors.fullName && formData.fullName && <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><CheckIcon /></div>}
+                                            </div>
+                                            {touched.fullName && errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
+                                        </div>
+                                        <div className="grid sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label htmlFor="email" className="block text-sm font-medium text-dark-slate">Email Address</label>
+                                                <div className="relative mt-1">
+                                                    <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} required className={`block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.email && errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`} />
+                                                    {touched.email && !errors.email && formData.email && <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><CheckIcon /></div>}
+                                                </div>
+                                                {touched.email && errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                                            </div>
+                                            <div>
+                                                <label htmlFor="phone" className="block text-sm font-medium text-dark-slate">Phone Number</label>
+                                                <div className="relative mt-1">
+                                                    <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} onBlur={handleBlur} required className={`block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.phone && errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`} />
+                                                    {touched.phone && !errors.phone && formData.phone && <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><CheckIcon /></div>}
+                                                </div>
+                                                {touched.phone && errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label htmlFor="shippingAddress" className="block text-sm font-medium text-dark-slate">Shipping Address</label>
+                                            <textarea id="shippingAddress" name="shippingAddress" rows={3} value={formData.shippingAddress} onChange={handleChange} onBlur={handleBlur} required className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.shippingAddress && errors.shippingAddress ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`}></textarea>
+                                            {touched.shippingAddress && errors.shippingAddress && <p className="mt-1 text-sm text-red-600">{errors.shippingAddress}</p>}
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset className="space-y-4">
+                                        <legend className="font-heading text-lg font-semibold text-dark-slate/90 mb-2">Order Details</legend>
+                                        <div>
+                                            <label htmlFor="copies" className="block text-sm font-medium text-dark-slate">Number of Copies</label>
+                                            <input type="number" id="copies" name="copies" min="1" value={formData.copies} onChange={handleChange} onBlur={handleBlur} required className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.copies && errors.copies ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`} />
+                                            {touched.copies && errors.copies && <p className="mt-1 text-sm text-red-600">{errors.copies}</p>}
+                                        </div>
+                                    </fieldset>
+                                    
+                                    <fieldset className="p-4 border border-coral/30 rounded-lg bg-sand/50 space-y-4">
+                                        <div className="font-heading text-lg font-semibold text-dark-slate/90">Exclusive Book Signing (OCT 28, 2025)</div>
+                                        <div className="flex items-start">
+                                            <input id="joinEvent" name="joinEvent" type="checkbox" checked={formData.joinEvent} onChange={handleChange} className="h-4 w-4 text-coral border-gray-300 rounded focus:ring-coral mt-1" />
+                                            <label htmlFor="joinEvent" className="ml-3 block text-sm font-medium text-dark-slate">Yes! I want to join the book signing event.</label>
+                                        </div>
+                                        {formData.joinEvent && (
+                                            <div className="pl-7 space-y-4 transition-all duration-300 ease-in-out">
+                                                <div className="flex items-start">
+                                                    <input id="bringGuest" name="bringGuest" type="checkbox" checked={formData.bringGuest} onChange={handleChange} className="h-4 w-4 text-coral border-gray-300 rounded focus:ring-coral mt-1" />
+                                                    <label htmlFor="bringGuest" className="ml-3 block text-sm text-dark-slate">I'd like to bring a guest (+1).</label>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </fieldset>
+                                    
+                                    <div>
+                                        {submitError && (
+                                            <div className="my-4 text-center p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                                                <p><strong>Submission Failed:</strong> {submitError}</p>
+                                            </div>
+                                        )}
+                                        <button
+                                            type="submit"
+                                            disabled={isLoading || isFormInvalid}
+                                            className="w-full bg-coral text-white font-bold py-3 px-8 rounded-md text-lg shadow-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 ease-in-out flex justify-center items-center disabled:opacity-75 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                        >
+                                            {isLoading ? (
+                                                <>
+                                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Submitting...
+                                                </>
+                                            ) : (
+                                                'Submit Your Details'
+                                            )}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </>
+                    )}
                 </div>
             </div>
         </section>

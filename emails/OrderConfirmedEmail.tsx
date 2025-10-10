@@ -40,7 +40,7 @@ export const OrderConfirmedEmail = ({
               className="my-0 mx-auto"
             />
             <Heading className="text-dark-slate text-[28px] font-bold font-heading p-0 my-[30px] mx-0">
-              Your Order is Confirmed!
+              Your Order Details are Saved!
             </Heading>
           </Section>
           <Text className="text-dark-slate text-[16px] leading-[24px]">
@@ -58,11 +58,11 @@ export const OrderConfirmedEmail = ({
               Next Step: Payment
             </Heading>
             <Text className="text-[14px] leading-[22px] m-0">
-              To finalize your order, please make the payment and upload your receipt on our website.
+              To finalize your order, please click the link below to make your payment and upload the receipt.
             </Text>
              <Link
               className="bg-coral text-white font-semibold rounded-md text-[14px] py-3 px-5 no-underline text-center inline-block mt-4"
-              href={`${baseUrl}`}
+              href={`${baseUrl}/order/${trackingNumber}`}
               target="_blank"
             >
               Complete Your Order Now
@@ -70,7 +70,7 @@ export const OrderConfirmedEmail = ({
           </Section>
           
           <Text className="text-dark-slate text-[16px] leading-[24px]">
-            You can visit the 'Track Your Order' page on our website at any time and enter your tracking number to complete your payment. Please note that deliveries will commence after the official book launch on October 28th, 2025.
+            You can also visit the 'Track Your Order' page on our website at any time and enter your tracking number and email to check your status. Please note that deliveries will commence after the official book launch on October 28th, 2025.
           </Text>
           
           <Hr className="border border-solid border-coral/20 my-[26px] mx-0 w-full" />

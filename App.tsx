@@ -9,20 +9,33 @@ import PoetrySamplesSection from './components/PoetrySamplesSection';
 import ContactSection from './components/ContactSection';
 import PreOrderSection from './components/PreOrderSection';
 import OrderTrackingSection from './components/OrderTrackingSection';
+import OrderPaymentPage from './components/OrderPaymentPage';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<Page>(Page.Home);
-  const [initialTrackingInfo, setInitialTrackingInfo] = useState<{trackingNumber: string; email: string} | null>(null);
 
   useEffect(() => {
+    // This effect is for the state-based navigation, not for URL routing.
     window.scrollTo(0, 0);
   }, [activePage]);
   
-  const handleOrderSubmitSuccess = (trackingNumber: string, email: string) => {
-    setInitialTrackingInfo({ trackingNumber, email });
-    setActivePage(Page.OrderTracking);
-  };
-
+  // Simple client-side routing for the /order/:trackingNumber path
+  const path = window.location.pathname;
+  if (path.startsWith('/order/')) {
+      const trackingNumber = path.split('/')[2];
+      if (trackingNumber) {
+          // Render a special layout for the payment page
+          return (
+              <div className="min-h-screen flex flex-col">
+                  <Header activePage={activePage} setActivePage={setActivePage} />
+                  <main className="flex-grow">
+                      <OrderPaymentPage trackingNumber={trackingNumber} />
+                  </main>
+                  <Footer setActivePage={setActivePage} />
+              </div>
+          );
+      }
+  }
 
   const renderActivePage = () => {
     switch (activePage) {
@@ -35,9 +48,9 @@ const App: React.FC = () => {
       case Page.PoetrySamples:
         return <PoetrySamplesSection />;
       case Page.PreOrder:
-        return <PreOrderSection onOrderSubmitSuccess={handleOrderSubmitSuccess} />;
+        return <PreOrderSection />;
       case Page.OrderTracking:
-        return <OrderTrackingSection initialInfo={initialTrackingInfo} setInitialInfo={setInitialTrackingInfo} />;
+        return <OrderTrackingSection />;
       case Page.Contact:
         return <ContactSection />;
       default:

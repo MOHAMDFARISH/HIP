@@ -1,19 +1,20 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-export default async (req: Request) => {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'POST') {
-        return new Response(JSON.stringify({ message: 'Method Not Allowed' }), { status: 405 });
+        return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
     try {
-        const { trackingNumber, email } = await req.json();
+        const { trackingNumber, email } = req.body;
 
         if (!trackingNumber || !email) {
-            return new Response(JSON.stringify({ message: 'Tracking number and email are required.' }), { status: 400 });
+            return res.status(400).json({ message: 'Tracking number and email are required.' });
         }
 
         const { data, error } = await supabase
@@ -25,13 +26,13 @@ export default async (req: Request) => {
 
         if (error || !data) {
             console.warn(`Failed lookup for track# ${trackingNumber}:`, error?.message);
-            return new Response(JSON.stringify({ message: 'Order not found. Please verify your details and try again.' }), { status: 404 });
+            return res.status(404).json({ message: 'Order not found. Please verify your details and try again.' });
         }
 
-        return new Response(JSON.stringify({ order: data }), { status: 200 });
+        return res.status(200).json({ order: data });
 
     } catch (error: any) {
         console.error('Tracking Error:', error);
-        return new Response(JSON.stringify({ message: 'An internal server error occurred.' }), { status: 500 });
+        return res.status(500).json({ message: 'An internal server error occurred.' });
     }
 };

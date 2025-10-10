@@ -1,65 +1,53 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { nanoid } from 'nanoid';
-
-// No runtime export, defaults to Vercel's Node.js runtime.
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-interface OrderPayload {
-    fullName: string;
-    email: string;
-    phone: string;
-    shippingAddress: string;
-    copies: string; // From client form, it's a string, needs to be parsed
-    joinEvent: boolean;
-    bringGuest: boolean;
-}
-
-export default async (req: Request) => {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'POST') {
-        return new Response(JSON.stringify({ message: 'Method Not Allowed' }), { status: 405 });
+        return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
     try {
-        const orderData: OrderPayload = await req.json();
-        
-        // --- Server-side Validation ---
-        if (!orderData.fullName || !orderData.email || !orderData.phone || !orderData.shippingAddress) {
-            return new Response(JSON.stringify({ message: 'Missing required fields.' }), { status: 400 });
-        }
-        
-        const numberOfCopies = parseInt(orderData.copies, 10);
-        if (isNaN(numberOfCopies) || numberOfCopies < 1) {
-             return new Response(JSON.stringify({ message: 'Invalid number of copies.' }), { status: 400 });
+        const { fullName, email, phone, shippingAddress, copies, joinEvent, bringGuest } = req.body;
+
+        if (!fullName || !email || !phone || !shippingAddress) {
+            return res.status(400).json({ message: 'Missing required fields.' });
         }
 
-        // --- Generate Tracking Number ---
+        const numberOfCopies = parseInt(copies, 10);
+        if (isNaN(numberOfCopies) || numberOfCopies < 1) {
+            return res.status(400).json({ message: 'Invalid number of copies.' });
+        }
+
         const trackingNumber = `HIP-2025-${nanoid(5).toUpperCase()}`;
 
-        // --- Save Order to Supabase Database ---
-        // This insert will trigger the Edge Function to send the "Action Required" email.
         const { error: dbError } = await supabase.from('orders').insert({
             tracking_number: trackingNumber,
-            customer_name: orderData.fullName,
-            customer_email: orderData.email,
-            customer_phone: orderData.phone,
-            shipping_address: orderData.shippingAddress,
+            customer_name: fullName,
+            customer_email: email,
+            customer_phone: phone,
+            shipping_address: shippingAddress,
             number_of_copies: numberOfCopies,
-            join_event: orderData.joinEvent,
-            bring_guest: orderData.bringGuest,
-            status: 'pending_payment', // New status for orders awaiting payment
+            join_event: joinEvent,
+            bring_guest: bringGuest,
+            status: 'pending_payment',
         });
 
         if (dbError) {
-            throw new Error(`Database Error: ${dbError.message}`);
+            console.error('Database Error:', dbError);
+            return res.status(500).json({ message: `Database Error: ${dbError.message}` });
         }
 
-        return new Response(JSON.stringify({ success: true, trackingNumber }), { status: 200 });
+        return res.status(200).json({ success: true, trackingNumber });
 
     } catch (e: any) {
         console.error('Submission Error:', e);
-        return new Response(JSON.stringify({ message: e.message || 'An internal server error occurred.' }), { status: 500 });
+        return res.status(500).json({ 
+            message: e.message || 'An internal server error occurred.' 
+        });
     }
-};
+}

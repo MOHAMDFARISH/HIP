@@ -2,6 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { nanoid } from 'nanoid';
 
+export const runtime = 'edge';
+
 // This is a serverless function, so we can safely use environment variables
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
@@ -44,7 +46,6 @@ export default async (req: Request) => {
             shipping_address: orderData.shippingAddress,
             number_of_copies: orderData.copies,
             join_event: orderData.joinEvent,
-            // FIX: Corrected typo from 'orderAta' to 'orderData'.
             bring_guest: orderData.bringGuest,
             status: 'pending_payment', // New status for orders awaiting payment
         });
@@ -55,16 +56,8 @@ export default async (req: Request) => {
 
         return new Response(JSON.stringify({ success: true, trackingNumber }), { status: 200 });
 
-    // FIX: Renamed 'error' to 'e' in catch block to avoid potential naming conflicts.
     } catch (e: any) {
         console.error('Submission Error:', e);
         return new Response(JSON.stringify({ message: e.message || 'An internal server error occurred.' }), { status: 500 });
     }
-};
-
-// Vercel config for body parsing
-export const config = {
-  api: {
-    bodyParser: false, // Let the function handle FormData parsing
-  },
 };

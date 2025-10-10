@@ -1,6 +1,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+export const runtime = 'edge';
+
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -71,13 +73,4 @@ export default async (req: Request) => {
         console.error('Receipt Upload Error:', error);
         return new Response(JSON.stringify({ message: error.message || 'An internal server error occurred.' }), { status: 500 });
     }
-};
-
-// Vercel config to increase body size limit for file uploads
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
 };

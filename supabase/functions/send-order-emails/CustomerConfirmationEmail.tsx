@@ -1,4 +1,3 @@
-
 import {
   Body,
   Container,
@@ -11,8 +10,8 @@ import {
   Section,
   Text,
   Tailwind,
-} from '@react-email/components';
-import * as React from 'react';
+} from 'https://esm.sh/@react-email/components@0.0.15';
+import React from 'https://esm.sh/react@18.2.0';
 
 interface EmailProps {
   customerName: string;

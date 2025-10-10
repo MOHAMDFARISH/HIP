@@ -12,10 +12,17 @@ import OrderTrackingSection from './components/OrderTrackingSection';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<Page>(Page.Home);
+  const [initialTrackingInfo, setInitialTrackingInfo] = useState<{trackingNumber: string; email: string} | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [activePage]);
+  
+  const handleOrderSubmitSuccess = (trackingNumber: string, email: string) => {
+    setInitialTrackingInfo({ trackingNumber, email });
+    setActivePage(Page.OrderTracking);
+  };
+
 
   const renderActivePage = () => {
     switch (activePage) {
@@ -28,9 +35,9 @@ const App: React.FC = () => {
       case Page.PoetrySamples:
         return <PoetrySamplesSection />;
       case Page.PreOrder:
-        return <PreOrderSection />;
+        return <PreOrderSection onOrderSubmitSuccess={handleOrderSubmitSuccess} />;
       case Page.OrderTracking:
-        return <OrderTrackingSection />;
+        return <OrderTrackingSection initialInfo={initialTrackingInfo} setInitialInfo={setInitialTrackingInfo} />;
       case Page.Contact:
         return <ContactSection />;
       default:

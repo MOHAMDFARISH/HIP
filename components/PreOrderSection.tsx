@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import PaymentDetails from './PaymentDetails';
 
 // Checkmark icon for valid fields
 const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -16,7 +17,12 @@ const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-const PreOrderSection: React.FC = () => {
+interface PreOrderSectionProps {
+  onOrderSubmitSuccess: (trackingNumber: string, email: string) => void;
+}
+
+
+const PreOrderSection: React.FC<PreOrderSectionProps> = ({ onOrderSubmitSuccess }) => {
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -26,29 +32,11 @@ const PreOrderSection: React.FC = () => {
         joinEvent: false,
         bringGuest: false,
     });
-    const [trackingNumber, setTrackingNumber] = useState<string | null>(null);
-    const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
-    const [fileName, setFileName] = useState<string | null>(null);
-    const [file, setFile] = useState<File | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
-
-    // Environment variables for payment details with fallbacks
-    const bankName = process.env.BANK_NAME || 'Bank of Maldives';
-    const accountHolderName = process.env.ACCOUNT_HOLDER_NAME || 'Mariyam Hawla';
-    const usdAccountNumber = process.env.USD_ACCOUNT_NUMBER || '7770000081709';
-    const mvrAccountNumber = process.env.MVR_ACCOUNT_NUMBER || '7704240648101';
-
-    const handleCopy = (account: string) => {
-        navigator.clipboard.writeText(account.replace(/\s/g, ''));
-        setCopiedAccount(account);
-        setTimeout(() => setCopiedAccount(null), 2000);
-    };
-
+   
     const validate = useCallback(() => {
         const newErrors: { [key: string]: string } = {};
         if (!formData.fullName.trim()) newErrors.fullName = 'Full Name is required.';
@@ -64,30 +52,14 @@ const PreOrderSection: React.FC = () => {
         }
         if (!formData.shippingAddress.trim()) newErrors.shippingAddress = 'Shipping Address is required.';
         if (!formData.copies || parseInt(formData.copies, 10) < 1) newErrors.copies = 'You must order at least 1 copy.';
-        if (!file) {
-            newErrors.receipt = 'Payment receipt is required.';
-        } else {
-            if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                newErrors.receipt = 'File size must not exceed 5MB.';
-            }
-            if (!['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'].includes(file.type)) {
-                newErrors.receipt = 'Please upload a valid image or PDF file.';
-            }
-        }
         return newErrors;
-    }, [formData, file]);
+    }, [formData]);
 
     useEffect(() => {
         const validationErrors = validate();
         setErrors(validationErrors);
-    }, [formData, file, validate]);
+    }, [formData, validate]);
     
-    useEffect(() => {
-        if (isSubmitted) {
-            window.scrollTo(0, 0);
-        }
-    }, [isSubmitted]);
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const target = e.target as HTMLInputElement;
         const { name, value, type, checked } = target;
@@ -99,20 +71,7 @@ const PreOrderSection: React.FC = () => {
     };
     
     const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        // FIX: The `name` variable was undefined. Using `e.target.name` to get the field name.
         setTouched(prev => ({ ...prev, [e.target.name]: true }));
-    };
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTouched(prev => ({...prev, receipt: true}));
-        if (event.target.files && event.target.files.length > 0) {
-            const selectedFile = event.target.files[0];
-            setFileName(selectedFile.name);
-            setFile(selectedFile);
-        } else {
-            setFileName(null);
-            setFile(null);
-        }
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -120,12 +79,12 @@ const PreOrderSection: React.FC = () => {
         setSubmitError(null);
         setTouched({
             fullName: true, email: true, phone: true,
-            shippingAddress: true, copies: true, receipt: true
+            shippingAddress: true, copies: true
         });
         const formErrors = validate();
         setErrors(formErrors);
         if (Object.keys(formErrors).length > 0) return;
-        if (isLoading || !file) return;
+        if (isLoading) return;
 
         setIsLoading(true);
         
@@ -133,10 +92,9 @@ const PreOrderSection: React.FC = () => {
         Object.keys(formData).forEach(key => {
             data.append(key, String(formData[key as keyof typeof formData]));
         });
-        data.append('receipt', file);
 
         try {
-            const response = await fetch('/api/submit-pre-order', {
+            const response = await fetch('/api/submit-order', {
                 method: 'POST',
                 body: data,
             });
@@ -147,8 +105,8 @@ const PreOrderSection: React.FC = () => {
                 throw new Error(result.message || 'Something went wrong. Please try again.');
             }
             
-            setTrackingNumber(result.trackingNumber);
-            setIsSubmitted(true);
+            // Redirect to tracking page via App component
+            onOrderSubmitSuccess(result.trackingNumber, formData.email);
 
         } catch (error: any) {
             setSubmitError(error.message);
@@ -157,51 +115,6 @@ const PreOrderSection: React.FC = () => {
         }
     };
     
-    const resetForm = () => {
-        setIsSubmitted(false);
-        setTrackingNumber(null);
-        setFormData({ fullName: '', email: '', phone: '', shippingAddress: '', copies: '1', joinEvent: false, bringGuest: false });
-        setFile(null);
-        setFileName(null);
-        setErrors({});
-        setTouched({});
-        setSubmitError(null);
-        if(fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
-    };
-    
-    const renderConfirmationMessage = () => (
-        <div className="text-center p-8 bg-sand/80 rounded-lg shadow-inner border border-coral/30">
-            <h3 className="font-heading text-3xl font-semibold text-dark-slate mb-4">Thank You! Your Submission is Received.</h3>
-            <p className="text-dark-slate/80 mb-6">
-                We've received your pre-order submission and are now verifying your payment details. You will receive a separate, official confirmation email once your order is approved.
-            </p>
-            <div className="bg-white/70 p-4 rounded-lg border border-coral/20 max-w-md mx-auto">
-                <p className="text-sm font-semibold text-dark-slate/90">Your Order Tracking Number:</p>
-                <p className="text-2xl font-bold font-mono text-coral tracking-wider my-2">{trackingNumber}</p>
-                <p className="text-xs text-dark-slate/70">Please save this number. You can use it to track your order status.</p>
-            </div>
-            {formData.joinEvent && (
-                <p className="text-dark-slate/80 font-semibold mt-6">
-                    {`We have also provisionally reserved your spot ${formData.bringGuest ? "(+1 guest) " : ""}for the exclusive book signing event, pending confirmation!`}
-                </p>
-            )}
-            <button
-                onClick={resetForm}
-                className="mt-8 bg-coral text-white font-bold py-2 px-6 rounded-md shadow-lg hover:bg-opacity-90 transition-all duration-300"
-            >
-                Submit Another Order
-            </button>
-        </div>
-    );
-    
-    const CopyButton: React.FC<{ text: string }> = ({ text }) => (
-        <button type="button" onClick={() => handleCopy(text)} className="ml-2 px-2 py-1 text-xs font-semibold text-coral bg-sand rounded hover:bg-coral/20 transition-colors">
-            {copiedAccount === text ? 'Copied!' : 'Copy'}
-        </button>
-    );
-
     const isFormInvalid = Object.keys(errors).length > 0;
 
     return (
@@ -218,40 +131,19 @@ const PreOrderSection: React.FC = () => {
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Pre-Order 'Heal in Paradise'</h2>
                         <p className="mt-4 text-lg text-dark-slate/70 max-w-3xl mx-auto">
-                            Secure your collector's edition and get a chance to meet the author at the exclusive launch event.
+                           Step 1: Fill in your details below. You'll be redirected to upload your receipt after submission.
                         </p>
                     </div>
 
-                    {isSubmitted ? renderConfirmationMessage() : (
-                    <div className="max-w-3xl mx-auto space-y-12">
-                        <div className="p-6 rounded-lg bg-sand/80 border border-coral/50 shadow-lg">
-                            <h3 className="font-heading text-2xl font-semibold text-dark-slate mb-4">
-                                <span className="text-coral">Step 1:</span> Make Your Payment
-                            </h3>
-                            <div className="border-b border-coral/30 pb-4 mb-4">
-                                <div className="flex justify-end items-baseline">
-                                    <p className="text-2xl font-bold text-coral font-body">$25 / MVR 369</p>
-                                </div>
-                                <p className="text-sm text-dark-slate/80 mt-1 text-right">Collector's Edition • Includes shipping within Maldives</p>
-                            </div>
-                            <p className="text-dark-slate/80 mb-4">Please transfer to one of the accounts below and save a digital copy of your receipt.</p>
-                            <div className="p-4 bg-white/60 rounded-md space-y-3 text-sm text-dark-slate/90 border border-coral/20">
-                                <p><span className="font-semibold">Bank:</span> {bankName}</p>
-                                <p><span className="font-semibold">Account Name:</span> {accountHolderName}</p>
-                                <div className="flex items-center justify-between">
-                                    <p>USD Account: <span className="font-mono bg-white/90 px-2 py-1 rounded select-all">{usdAccountNumber}</span></p>
-                                    <CopyButton text={usdAccountNumber} />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <p>MVR Account: <span className="font-mono bg-white/90 px-2 py-1 rounded select-all">{mvrAccountNumber}</span></p>
-                                    <CopyButton text={mvrAccountNumber} />
-                                </div>
-                            </div>
-                        </div>
+                    <div className="max-w-3xl mx-auto">
+                        <PaymentDetails
+                            title="Payment Information"
+                            description="After submitting your details, you will be redirected to upload your payment receipt. Please use the account details below for the transfer."
+                        />
 
-                        <div className="p-6 rounded-lg bg-white/60 border border-coral/30">
+                        <div className="p-6 rounded-lg bg-white/60 border border-coral/30 mt-12">
                             <h3 className="font-heading text-2xl font-semibold text-dark-slate mb-6">
-                                <span className="text-coral">Step 2:</span> Complete Your Order
+                               <span className="text-coral">Enter Your Details</span>
                             </h3>
                             <form onSubmit={handleSubmit} className="space-y-8" noValidate>
                                 <fieldset className="space-y-4">
@@ -296,17 +188,6 @@ const PreOrderSection: React.FC = () => {
                                         <input type="number" id="copies" name="copies" min="1" value={formData.copies} onChange={handleChange} onBlur={handleBlur} required className={`mt-1 block w-full px-3 py-2 bg-white border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 sm:text-sm text-dark-slate ${touched.copies && errors.copies ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-coral focus:ring-coral'}`} />
                                         {touched.copies && errors.copies && <p className="mt-1 text-sm text-red-600">{errors.copies}</p>}
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-dark-slate">Upload Payment Receipt</label>
-                                        <div className="mt-1">
-                                            <button type="button" onClick={() => fileInputRef.current?.click()} className={`w-full px-4 py-2 border rounded-md shadow-sm text-sm font-medium text-dark-slate bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral truncate ${touched.receipt && errors.receipt ? 'border-red-500' : 'border-gray-300'}`}>
-                                                {fileName || 'Choose File (JPG, PNG, PDF - max 5MB)'}
-                                            </button>
-                                            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/png, image/jpeg, image/jpg, application/pdf" required />
-                                        </div>
-                                        {touched.receipt && !errors.receipt && file && <div className="mt-2 text-sm text-green-600 flex items-center"><CheckIcon className="mr-2" />Receipt uploaded successfully.</div>}
-                                        {touched.receipt && errors.receipt && <p className="mt-1 text-sm text-red-600">{errors.receipt}</p>}
-                                    </div>
                                 </fieldset>
                                 
                                 <fieldset className="p-4 border border-coral/30 rounded-lg bg-sand/50 space-y-4">
@@ -321,19 +202,8 @@ const PreOrderSection: React.FC = () => {
                                                 <input id="bringGuest" name="bringGuest" type="checkbox" checked={formData.bringGuest} onChange={handleChange} className="h-4 w-4 text-coral border-gray-300 rounded focus:ring-coral mt-1" />
                                                 <label htmlFor="bringGuest" className="ml-3 block text-sm text-dark-slate">I'd like to bring a guest (+1).</label>
                                             </div>
-                                             <div className="p-3 bg-white/60 rounded-lg border border-coral/20 text-sm text-dark-slate/90">
-                                                <p className="font-bold mb-2">You're invited!</p>
-                                                <ul className="list-none space-y-1">
-                                                    <li><strong className="font-semibold">Date:</strong> October 28, 2025</li>
-                                                    <li><strong className="font-semibold">Includes:</strong> Tea, and a meet & greet with the author.</li>
-                                                    <li><strong className="font-semibold">Venue:</strong> The location will be shared in your order confirmation email.</li>
-                                                </ul>
-                                            </div>
                                         </div>
                                     )}
-                                    <p className="text-center text-sm font-medium text-dark-slate/80 pt-4 border-t border-coral/20">
-                                       Please note: Pre-order deliveries will begin after the book signing event on October 28th, 2025.
-                                    </p>
                                 </fieldset>
                                 
                                 <div>
@@ -353,17 +223,16 @@ const PreOrderSection: React.FC = () => {
                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                 </svg>
-                                                Submitting...
+                                                Confirming...
                                             </>
                                         ) : (
-                                            'Submit Pre-Order'
+                                            'Confirm Order Details'
                                         )}
                                     </button>
                                 </div>
                             </form>
                         </div>
                     </div>
-                    )}
                 </div>
             </div>
         </section>

@@ -32,6 +32,7 @@ const PreOrderSection: React.FC = () => {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
     const [orderSubmitted, setOrderSubmitted] = useState(false);
+    const [submittedTrackingNumber, setSubmittedTrackingNumber] = useState<string | null>(null);
    
     const validate = useCallback(() => {
         const newErrors: { [key: string]: string } = {};
@@ -99,6 +100,7 @@ const PreOrderSection: React.FC = () => {
                 throw new Error(result.message || 'Something went wrong. Please try again.');
             }
             
+            setSubmittedTrackingNumber(result.trackingNumber);
             setOrderSubmitted(true);
             window.scrollTo(0, 0);
 
@@ -126,11 +128,28 @@ const PreOrderSection: React.FC = () => {
                         <div className="text-center py-20">
                             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Submission Received!</h2>
                             <p className="mt-4 text-lg text-dark-slate/70 max-w-2xl mx-auto">
-                                Thank you for your interest! We've saved your details.
+                                Thank you! Your pre-order details have been saved.
                             </p>
                             <p className="mt-2 text-lg text-dark-slate/70 max-w-2xl mx-auto">
-                                Please check your email for a link to complete your payment and finalize your pre-order.
+                                An email is on its way with a link to finalize your payment.
                             </p>
+                            {submittedTrackingNumber && (
+                                <div className="mt-8 max-w-lg mx-auto bg-sand/50 p-6 rounded-lg border border-coral/30 shadow-inner">
+                                    <h3 className="font-heading text-xl font-semibold text-dark-slate mb-3">Ready to complete your order now?</h3>
+                                    <p className="text-dark-slate/80 mb-5">
+                                        Click the button below to proceed to payment and secure your copy.
+                                    </p>
+                                    <a
+                                        href={`/order/${submittedTrackingNumber}`}
+                                        className="inline-block bg-coral text-white font-bold py-3 px-8 rounded-md text-lg shadow-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 ease-in-out"
+                                    >
+                                        Complete Payment
+                                    </a>
+                                    <p className="text-xs text-dark-slate/60 mt-5">
+                                        Your tracking number is: <strong className="font-mono">{submittedTrackingNumber}</strong>
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     ) : (
                     <>

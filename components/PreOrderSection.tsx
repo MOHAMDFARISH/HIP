@@ -88,15 +88,13 @@ const PreOrderSection: React.FC<PreOrderSectionProps> = ({ onOrderSubmitSuccess 
 
         setIsLoading(true);
         
-        const data = new FormData();
-        Object.keys(formData).forEach(key => {
-            data.append(key, String(formData[key as keyof typeof formData]));
-        });
-
         try {
             const response = await fetch('/api/submit-order', {
                 method: 'POST',
-                body: data,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
             });
 
             const result = await response.json();

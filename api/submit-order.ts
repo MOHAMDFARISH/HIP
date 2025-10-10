@@ -1,14 +1,21 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { nanoid } from 'nanoid';
 
-export const runtime = 'edge';
+// No runtime export, defaults to Vercel's Node.js runtime.
 
-// This is a serverless function, so we can safely use environment variables
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
-
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+interface OrderPayload {
+    fullName: string;
+    email: string;
+    phone: string;
+    shippingAddress: string;
+    copies: string; // From client form, it's a string, needs to be parsed
+    joinEvent: boolean;
+    bringGuest: boolean;
+}
 
 export default async (req: Request) => {
     if (req.method !== 'POST') {
@@ -16,21 +23,16 @@ export default async (req: Request) => {
     }
 
     try {
-        const formData = await req.formData();
+        const orderData: OrderPayload = await req.json();
         
-        const orderData = {
-            fullName: formData.get('fullName') as string,
-            email: formData.get('email') as string,
-            phone: formData.get('phone') as string,
-            shippingAddress: formData.get('shippingAddress') as string,
-            copies: parseInt(formData.get('copies') as string, 10),
-            joinEvent: formData.get('joinEvent') === 'true',
-            bringGuest: formData.get('bringGuest') === 'true',
-        };
-
         // --- Server-side Validation ---
         if (!orderData.fullName || !orderData.email || !orderData.phone || !orderData.shippingAddress) {
             return new Response(JSON.stringify({ message: 'Missing required fields.' }), { status: 400 });
+        }
+        
+        const numberOfCopies = parseInt(orderData.copies, 10);
+        if (isNaN(numberOfCopies) || numberOfCopies < 1) {
+             return new Response(JSON.stringify({ message: 'Invalid number of copies.' }), { status: 400 });
         }
 
         // --- Generate Tracking Number ---
@@ -44,7 +46,7 @@ export default async (req: Request) => {
             customer_email: orderData.email,
             customer_phone: orderData.phone,
             shipping_address: orderData.shippingAddress,
-            number_of_copies: orderData.copies,
+            number_of_copies: numberOfCopies,
             join_event: orderData.joinEvent,
             bring_guest: orderData.bringGuest,
             status: 'pending_payment', // New status for orders awaiting payment

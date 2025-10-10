@@ -9,8 +9,13 @@ interface State {
 }
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, State> {
-  // FIX: Initialize state as a class property. This is a modern and clean way to set initial state and ensures `this.state` is available.
-  state: State = { hasError: false };
+  // FIX: The component was throwing a type error where `this.props` was not recognized.
+  // By using a constructor to initialize state and explicitly call `super(props)`, we ensure
+  // the component's props are correctly typed and accessible, resolving the issue.
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
   static getDerivedStateFromError(_: Error): State {
     // Update state so the next render will show the fallback UI.

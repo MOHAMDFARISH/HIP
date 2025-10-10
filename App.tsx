@@ -13,25 +13,45 @@ import OrderPaymentPage from './components/OrderPaymentPage';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<Page>(Page.Home);
+  // State to manage the current URL path, enabling reactive routing
+  const [path, setPath] = useState(window.location.pathname);
+
+  // Effect to handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      setPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  // Central navigation handler
+  const handleNavigate = (page: Page) => {
+    // If on a special URL like /order/, update the URL to '/' for SPA navigation
+    if (path.startsWith('/order/')) {
+      window.history.pushState({}, '', '/');
+      setPath('/'); // Update state to trigger re-render
+    }
+    setActivePage(page);
+  };
 
   useEffect(() => {
-    // This effect is for the state-based navigation, not for URL routing.
     window.scrollTo(0, 0);
-  }, [activePage]);
+  }, [activePage, path]);
   
-  // Simple client-side routing for the /order/:trackingNumber path
-  const path = window.location.pathname;
+  // Routing logic now uses the `path` state variable
   if (path.startsWith('/order/')) {
       const trackingNumber = path.split('/')[2];
       if (trackingNumber) {
-          // Render a special layout for the payment page
           return (
               <div className="min-h-screen flex flex-col">
-                  <Header activePage={activePage} setActivePage={setActivePage} />
+                  <Header activePage={activePage} setActivePage={handleNavigate} />
                   <main className="flex-grow">
                       <OrderPaymentPage trackingNumber={trackingNumber} />
                   </main>
-                  <Footer setActivePage={setActivePage} />
+                  <Footer setActivePage={handleNavigate} />
               </div>
           );
       }
@@ -40,7 +60,7 @@ const App: React.FC = () => {
   const renderActivePage = () => {
     switch (activePage) {
       case Page.Home:
-        return <HeroSection setActivePage={setActivePage} />;
+        return <HeroSection setActivePage={handleNavigate} />;
       case Page.AboutTheBook:
         return <AboutBookSection />;
       case Page.MeetHawlaRiza:
@@ -54,17 +74,17 @@ const App: React.FC = () => {
       case Page.Contact:
         return <ContactSection />;
       default:
-        return <HeroSection setActivePage={setActivePage} />;
+        return <HeroSection setActivePage={handleNavigate} />;
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header activePage={activePage} setActivePage={setActivePage} />
+      <Header activePage={activePage} setActivePage={handleNavigate} />
       <main className="flex-grow">
         {renderActivePage()}
       </main>
-      <Footer setActivePage={setActivePage} />
+      <Footer setActivePage={handleNavigate} />
     </div>
   );
 };

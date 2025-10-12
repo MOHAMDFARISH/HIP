@@ -1,6 +1,8 @@
 import React from 'react';
 import { FacebookIcon, InstagramIcon, XIcon, TikTokIcon, ThreadsIcon, LinktreeIcon } from './icons/SocialIcons';
 
+const contactEmail = process.env.CONTACT_EMAIL || 'hello@hawlariza.com';
+
 const ContactSection: React.FC = () => {
   return (
     <section className="py-16 md:py-24">
@@ -35,8 +37,8 @@ const ContactSection: React.FC = () => {
             <div className="bg-sand/80 backdrop-blur-sm p-8 rounded-lg shadow-lg text-center border border-coral/50">
               <h3 className="font-heading text-2xl font-semibold text-dark-slate mb-4">Direct Contact</h3>
               <p className="text-dark-slate/70 mb-6">For direct inquiries, please send an email to:</p>
-              <a href="mailto:info@healinparadise.com" className="text-coral font-bold text-lg hover:underline">
-                info@healinparadise.com
+              <a href={`mailto:${contactEmail}`} className="text-coral font-bold text-lg hover:underline">
+                {contactEmail}
               </a>
             </div>
           </div>

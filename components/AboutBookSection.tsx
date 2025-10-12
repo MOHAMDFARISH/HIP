@@ -83,7 +83,7 @@ const AboutBookSection: React.FC = () => {
                             </div>
                         </div>
                         <div className="text-dark-slate">
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate mb-6">Heal in Paradise: The Genesis of a Maldivian Treasure</h2>
+                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate mb-6">Heal in Paradise: An Odyssey into the Maldivian Soul</h2>
                             <p className="text-lg mb-8 text-dark-slate/80">
                                 More than a collection of poems, 'Heal in Paradise' is an intimate odyssey into the heart of the Maldives, weaving tales of resilience, hope, and the profound connection to island life.
                             </p>

@@ -17,6 +17,12 @@ const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
+const CalendarIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 text-coral ${className || ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);
+
 const PreOrderSection: React.FC = () => {
     const [formData, setFormData] = useState({
         fullName: '',
@@ -215,17 +221,29 @@ const PreOrderSection: React.FC = () => {
                                         </div>
                                     </fieldset>
                                     
-                                    <fieldset className="p-4 border border-coral/30 rounded-lg bg-sand/50 space-y-4">
-                                        <div className="font-heading text-lg font-semibold text-dark-slate/90">Exclusive Book Signing (OCT 28, 2025)</div>
-                                        <div className="flex items-start">
-                                            <input id="joinEvent" name="joinEvent" type="checkbox" checked={formData.joinEvent} onChange={handleChange} className="h-4 w-4 text-coral border-gray-300 rounded focus:ring-coral mt-1" />
-                                            <label htmlFor="joinEvent" className="ml-3 block text-sm font-medium text-dark-slate">Yes! I want to join the book signing event.</label>
+                                    <fieldset className="p-6 border-2 border-coral/40 rounded-lg bg-coral/10 space-y-4 shadow-md transition-all hover:shadow-lg">
+                                        <div className="flex items-center gap-3">
+                                            <CalendarIcon />
+                                            <legend className="font-heading text-xl font-bold text-dark-slate">Exclusive Book Signing <span className="text-coral">(OCT 28, 2025)</span></legend>
+                                        </div>
+                                        <p className="text-dark-slate/80 text-sm pl-9">Be part of the official launch! Register your interest now to receive an exclusive invitation.</p>
+                                        <div className="mt-4 pl-9">
+                                            <label htmlFor="joinEvent" className="flex items-center cursor-pointer group">
+                                                <input id="joinEvent" name="joinEvent" type="checkbox" checked={formData.joinEvent} onChange={handleChange} className="h-5 w-5 text-coral border-gray-400 rounded focus:ring-coral focus:ring-2 focus:ring-offset-2 focus:ring-offset-coral/10" />
+                                                <span className="ml-3 block text-base font-semibold text-dark-slate group-hover:text-coral transition-colors">
+                                                    Yes! I want to join the book signing event.
+                                                </span>
+                                            </label>
                                         </div>
                                         {formData.joinEvent && (
-                                            <div className="pl-7 space-y-4 transition-all duration-300 ease-in-out">
-                                                <div className="flex items-start">
-                                                    <input id="bringGuest" name="bringGuest" type="checkbox" checked={formData.bringGuest} onChange={handleChange} className="h-4 w-4 text-coral border-gray-300 rounded focus:ring-coral mt-1" />
-                                                    <label htmlFor="bringGuest" className="ml-3 block text-sm text-dark-slate">I'd like to bring a guest (+1).</label>
+                                            <div className="pl-16 space-y-4 transition-all duration-300 ease-in-out">
+                                                <div className="border-t border-coral/20 pt-4">
+                                                    <label htmlFor="bringGuest" className="flex items-center cursor-pointer group">
+                                                        <input id="bringGuest" name="bringGuest" type="checkbox" checked={formData.bringGuest} onChange={handleChange} className="h-5 w-5 text-coral border-gray-400 rounded focus:ring-coral focus:ring-2 focus:ring-offset-2 focus:ring-offset-coral/10" />
+                                                        <span className="ml-3 block text-base font-medium text-dark-slate group-hover:text-coral transition-colors">
+                                                            I'd like to bring a guest (+1).
+                                                        </span>
+                                                    </label>
                                                 </div>
                                             </div>
                                         )}

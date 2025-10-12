@@ -1,0 +1,10 @@
+# Allow all crawlers access to the site
+User-agent: *
+Allow: /
+
+# Disallow crawlers from accessing sensitive or non-public directories
+Disallow: /api/
+Disallow: /order/
+
+# Point crawlers to the XML sitemap
+Sitemap: https://hawlariza.com/sitemap.xml

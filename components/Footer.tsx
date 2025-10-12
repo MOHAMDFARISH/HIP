@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Page } from '../types';
 import { FacebookIcon, InstagramIcon, XIcon, TikTokIcon, ThreadsIcon, LinktreeIcon } from './icons/SocialIcons';
@@ -7,6 +5,8 @@ import { FacebookIcon, InstagramIcon, XIcon, TikTokIcon, ThreadsIcon, LinktreeIc
 interface FooterProps {
   setActivePage: (page: Page) => void;
 }
+
+const contactEmail = process.env.CONTACT_EMAIL || 'hello@hawlariza.com';
 
 const BookIcon: React.FC = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-dark-slate/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -86,10 +86,10 @@ const Footer: React.FC<FooterProps> = ({ setActivePage }) => {
                       </div>
                   </div>
                   
-                  <a href="mailto:info@healinparadise.com" className="flex items-center justify-center md:justify-start text-dark-slate/90 hover:text-coral group transition-all duration-300">
+                  <a href={`mailto:${contactEmail}`} className="flex items-center justify-center md:justify-start text-dark-slate/90 hover:text-coral group transition-all duration-300">
                       <EmailIcon />
                       <span className="font-semibold text-base group-hover:underline">
-                          info@healinparadise.com
+                          {contactEmail}
                       </span>
                   </a>
               </div>

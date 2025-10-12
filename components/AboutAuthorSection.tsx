@@ -1,9 +1,13 @@
-
-
-
-
 import React from 'react';
 import { FacebookIcon, InstagramIcon, XIcon, TikTokIcon, ThreadsIcon, LinktreeIcon } from './icons/SocialIcons';
+
+// Performance Optimization: Generate responsive image sources for Cloudinary
+const authorImageBaseUrl = "https://res.cloudinary.com/dmtolfhsv/image/upload";
+const authorImageId = "v1758977323/PXL_20250727_075925036.MP_croped_t5jbqj.jpg";
+
+const authorImageSrcSet = [400, 600, 800]
+    .map(w => `${authorImageBaseUrl}/f_auto,q_auto,w_${w}/${authorImageId} ${w}w`)
+    .join(', ');
 
 const AboutAuthorSection: React.FC = () => {
   return (
@@ -18,13 +22,17 @@ const AboutAuthorSection: React.FC = () => {
           }}
         >
           <div className="grid md:grid-cols-5 gap-10 lg:gap-16 items-center">
-            {/* Author Portrait - replace with actual image */}
+            {/* Author Portrait */}
             <div className="md:col-span-2">
               <img 
-                src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_auto/v1758977323/PXL_20250727_075925036.MP_croped_t5jbqj.jpg" 
-                alt="Portrait of Hawla Riza" 
+                src={`${authorImageBaseUrl}/f_auto,q_auto,w_400/${authorImageId}`}
+                srcSet={authorImageSrcSet}
+                sizes="(max-width: 768px) 90vw, 40vw"
+                alt="Portrait of Hawla Riza, author of the Maldivian poetry book 'Heal in Paradise'." 
                 className="rounded-lg shadow-lg w-full h-auto object-cover aspect-[4/5] transform transition-transform duration-500 hover:scale-105" 
                 loading="lazy"
+                width="400"
+                height="500"
               />
             </div>
             <div className="md:col-span-3 text-dark-slate">

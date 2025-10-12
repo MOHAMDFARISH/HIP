@@ -1,5 +1,13 @@
 import React from 'react';
 
+// Performance Optimization: Generate responsive image sources for Cloudinary
+const bookCoverBaseUrl = "https://res.cloudinary.com/dmtolfhsv/image/upload";
+const bookCoverId = "v1758360518/Untitled_eBook_l721h0.png";
+
+const bookCoverSrcSet = [300, 400, 600, 800]
+  .map(w => `${bookCoverBaseUrl}/f_auto,q_auto,w_${w}/${bookCoverId} ${w}w`)
+  .join(', ');
+
 const FeatureItem: React.FC<{ icon: React.ReactNode; text: string }> = ({ icon, text }) => (
     <div className="flex items-start space-x-3">
         <div className="flex-shrink-0 text-coral mt-1">{icon}</div>
@@ -59,15 +67,28 @@ const AboutBookSection: React.FC = () => {
                 >
                     <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-start">
                         <div className="w-full max-w-sm mx-auto">
-                           {/* Book mockup image */}
                             <div className="relative">
-                                <img src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_auto/v1758360518/Untitled_eBook_l721h0.png" alt="Heal in Paradise book cover" className="rounded-lg shadow-lg w-full transform transition-transform duration-500 hover:scale-105" loading="lazy" />
+                                <img 
+                                    src={`${bookCoverBaseUrl}/f_auto,q_auto,w_400/${bookCoverId}`}
+                                    srcSet={bookCoverSrcSet}
+                                    sizes="(max-width: 640px) 90vw, 384px"
+                                    alt="The official book cover for 'Heal in Paradise', a collection of Maldivian poetry by Hawla Riza." 
+                                    className="rounded-lg shadow-lg w-full transform transition-transform duration-500 hover:scale-105" 
+                                    loading="lazy" 
+                                    width="384"
+                                    height="576"
+                                />
                                 <div className="absolute top-[-5px] right-[-5px] w-24 h-24 md:w-28 md:h-28">
-                                   <img src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_auto/v1758360969/International_women_s_day_1_tghs6c.png" alt="International Women's Day Recognition Badge" loading="lazy" />
+                                   <img 
+                                      src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_112/v1758360969/International_women_s_day_1_tghs6c.png" 
+                                      alt="International Women's Day Recognition for the book Heal in Paradise, a Maldivian literary souvenir." 
+                                      loading="lazy"
+                                      width="112"
+                                      height="112"
+                                  />
                                 </div>
                             </div>
                             
-                            {/* Book Specifications Card */}
                             <div className="mt-8 bg-sand/50 p-6 rounded-lg border border-coral/30 shadow-inner">
                                 <h3 className="font-heading text-xl font-semibold text-dark-slate mb-4 border-b border-coral/20 pb-2">
                                     Book Specifications

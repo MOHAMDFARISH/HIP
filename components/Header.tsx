@@ -35,6 +35,7 @@ const Header: React.FC<HeaderProps> = ({ activePage, setActivePage }) => {
     Page.PoetrySamples,
     Page.PreOrder,
     Page.OrderTracking,
+    Page.FAQ,
     Page.Contact,
   ];
 
@@ -47,7 +48,14 @@ const Header: React.FC<HeaderProps> = ({ activePage, setActivePage }) => {
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg shadow-md">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <button onClick={() => handleNavClick(Page.Home)} className="flex items-center space-x-3" aria-label="Go to homepage">
-          <img src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_auto/v1759086831/android-chrome-192x192_t34m0h.png" alt="Heal in Paradise Logo" className="h-12 w-12" />
+          <img 
+            src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_48/v1759086831/android-chrome-192x192_t34m0h.png" 
+            alt="Logo for Heal in Paradise, a Maldivian poetry collection" 
+            className="h-12 w-12"
+            width="48"
+            height="48"
+            loading="lazy"
+          />
           <span className="text-2xl font-heading font-bold text-dark-slate">
             Heal in Paradise
           </span>

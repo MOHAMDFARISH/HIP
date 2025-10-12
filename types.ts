@@ -6,4 +6,5 @@ export enum Page {
   PreOrder = 'Pre-Order',
   OrderTracking = 'Track Your Order',
   Contact = 'Contact',
+  FAQ = 'FAQ',
 }

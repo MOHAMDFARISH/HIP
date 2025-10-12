@@ -10,6 +10,7 @@ import ContactSection from './components/ContactSection';
 import PreOrderSection from './components/PreOrderSection';
 import OrderTrackingSection from './components/OrderTrackingSection';
 import OrderPaymentPage from './components/OrderPaymentPage';
+import FAQSection from './components/FAQSection';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<Page>(Page.Home);
@@ -71,6 +72,8 @@ const App: React.FC = () => {
         return <PreOrderSection />;
       case Page.OrderTracking:
         return <OrderTrackingSection />;
+      case Page.FAQ:
+        return <FAQSection />;
       case Page.Contact:
         return <ContactSection />;
       default:

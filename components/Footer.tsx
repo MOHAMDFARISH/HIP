@@ -39,6 +39,7 @@ const Footer: React.FC<FooterProps> = ({ setActivePage }) => {
     Page.PoetrySamples,
     Page.PreOrder,
     Page.OrderTracking,
+    Page.FAQ,
     Page.Contact,
   ];
   
@@ -50,7 +51,14 @@ const Footer: React.FC<FooterProps> = ({ setActivePage }) => {
           <div className="md:col-span-2">
             <div className="max-w-lg">
               <div className="flex justify-center md:justify-start items-center gap-4 mb-4">
-                <img src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_auto/v1759086831/android-chrome-192x192_t34m0h.png" alt="Heal in Paradise Logo" className="h-16 w-16" loading="lazy" />
+                <img 
+                  src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_64/v1759086831/android-chrome-192x192_t34m0h.png" 
+                  alt="Heal in Paradise by Hawla Riza - Official Logo" 
+                  className="h-16 w-16" 
+                  loading="lazy"
+                  width="64"
+                  height="64"
+                />
                 <div>
                   <h3 className="font-heading text-3xl font-bold text-dark-slate flex items-center justify-center md:justify-start">
                     <BookIcon />

@@ -5,6 +5,14 @@ interface HeroSectionProps {
   setActivePage: (page: Page) => void;
 }
 
+// Performance Optimization: Generate responsive image sources for Cloudinary
+const bookCoverBaseUrl = "https://res.cloudinary.com/dmtolfhsv/image/upload";
+const bookCoverId = "v1758360518/Untitled_eBook_l721h0.png";
+
+const bookCoverSrcSet = [300, 400, 600]
+  .map(w => `${bookCoverBaseUrl}/f_auto,q_auto,w_${w}/${bookCoverId} ${w}w`)
+  .join(', ');
+
 const HeroSection: React.FC<HeroSectionProps> = ({ setActivePage }) => {
   return (
     <section className="relative min-h-[calc(100vh-80px)] flex items-center justify-center text-center text-white py-20 px-4 overflow-hidden">
@@ -21,15 +29,27 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setActivePage }) => {
           A journey of hope, healing, and the serene beauty of the islands.
         </p>
         
-        {/* Book Cover - replace with actual image */}
         <div className="mt-8 relative">
           <img 
-            src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_auto/v1758360518/Untitled_eBook_l721h0.png"
-            alt="Cover of Heal in Paradise book" 
-            className="w-48 md:w-64 rounded-lg shadow-2xl transform hover:scale-105 transition-transform duration-300" 
+            src={`${bookCoverBaseUrl}/f_auto,q_auto,w_256/${bookCoverId}`}
+            srcSet={bookCoverSrcSet}
+            sizes="(max-width: 768px) 192px, 256px"
+            alt="Heal in Paradise book cover - a Maldivian poetry collection by Hawla Riza" 
+            className="w-48 md:w-64 rounded-lg shadow-2xl transform hover:scale-105 transition-transform duration-300"
+            width="256"
+            height="384"
+            // FIX: The `fetchpriority` attribute should be camelCased to `fetchPriority` in React/JSX.
+            fetchPriority="high"
           />
           <div className="absolute top-[-17px] right-[-17px]">
-             <img src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_auto/v1758360969/International_women_s_day_1_tghs6c.png" alt="International Women's Day Recognition Badge" className="w-20 h-20 md:w-24 md:h-24" />
+             <img 
+                src="https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_96/v1758360969/International_women_s_day_1_tghs6c.png" 
+                alt="International Women's Day Recognition Badge for the book Heal in Paradise" 
+                className="w-20 h-20 md:w-24 md:h-24"
+                width="96"
+                height="96"
+                loading="lazy"
+            />
           </div>
         </div>
         

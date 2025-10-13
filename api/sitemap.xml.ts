@@ -9,15 +9,9 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-  <url>
-    <loc>https://www.hawlariza.com/</loc>
-    <lastmod>2025-10-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
 </urlset>`;
 
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
   res.status(200).send(sitemap);
 }

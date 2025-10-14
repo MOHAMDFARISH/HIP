@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
-// Environment variables for payment details with fallbacks
-const bankName = process.env.BANK_NAME || 'Bank of Maldives';
-const accountHolderName = process.env.ACCOUNT_HOLDER_NAME || 'Mariyam Hawla';
-const usdAccountNumber = process.env.USD_ACCOUNT_NUMBER || '7770000081709';
-const mvrAccountNumber = process.env.MVR_ACCOUNT_NUMBER || '7704240648101';
-const priceDetails = process.env.PRICE_DETAILS || '$25 / MVR 369';
+// FIX: Added optional chaining to prevent runtime errors if import.meta.env is not defined.
+const bankName = (import.meta as any)?.env?.VITE_BANK_NAME || 'Bank of Maldives';
+const accountHolderName = (import.meta as any)?.env?.VITE_ACCOUNT_HOLDER_NAME || 'Mariyam Hawla';
+const usdAccountNumber = (import.meta as any)?.env?.VITE_USD_ACCOUNT_NUMBER || '7770000081709';
+const mvrAccountNumber = (import.meta as any)?.env?.VITE_MVR_ACCOUNT_NUMBER || '7704240648101';
+const priceDetails = (import.meta as any)?.env?.VITE_PRICE_DETAILS || '$25 / MVR 369';
 
 interface PaymentDetailsProps {
     title: React.ReactNode;

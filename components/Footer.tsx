@@ -6,7 +6,8 @@ interface FooterProps {
   setActivePage: (page: Page) => void;
 }
 
-const contactEmail = process.env.CONTACT_EMAIL || 'hello@hawlariza.com';
+// FIX: Added optional chaining to prevent runtime errors if import.meta.env is not defined.
+const contactEmail = (import.meta as any)?.env?.VITE_CONTACT_EMAIL || 'hello@hawlariza.com';
 
 const BookIcon: React.FC = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-dark-slate/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

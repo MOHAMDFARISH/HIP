@@ -4,7 +4,8 @@ import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recapt
 
 // SECURITY UPDATE: Removed hardcoded fallback test key. The application will now fail safely
 // if the environment variable is not provided, preventing insecure deployments.
-const RECAPTCHA_SITE_KEY = (import.meta as any).env.VITE_RECAPTCHA_SITE_KEY;
+// FIX: Cast `import.meta` to `any` and use optional chaining to resolve TypeScript error with Vite environment variables.
+const RECAPTCHA_SITE_KEY = (import.meta as any)?.env?.VITE_RECAPTCHA_SITE_KEY;
 
 // Checkmark icon for valid fields
 const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -106,6 +107,8 @@ const PreOrderForm: React.FC = () => {
         }
         
         const token = await executeRecaptcha('submitOrder');
+        // DEBUG: Log the token to the console to verify it's being generated.
+        console.log('Generated reCAPTCHA token:', token);
         
         try {
             const response = await fetch('/api/submit-order', {

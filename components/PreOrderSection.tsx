@@ -44,26 +44,41 @@ const PreOrderSection: React.FC = () => {
     const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
     const [orderSubmitted, setOrderSubmitted] = useState(false);
     const [submittedTrackingNumber, setSubmittedTrackingNumber] = useState<string | null>(null);
+    const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
    
-    // Dynamically load the reCAPTCHA script
+    // Dynamically load the reCAPTCHA script and set a 'ready' state
     useEffect(() => {
         if (!recaptchaSiteKey) {
             console.warn('reCAPTCHA V3 site key is not configured.');
             return;
         }
+        const scriptId = 'recaptcha-v3-script';
+
+        const handleRecaptchaLoad = () => {
+            if (typeof grecaptcha !== 'undefined') {
+                grecaptcha.ready(() => {
+                    setIsRecaptchaReady(true);
+                });
+            }
+        };
+        
+        // If script already exists, just trigger the ready state handler
+        if (document.getElementById(scriptId)) {
+            handleRecaptchaLoad();
+            return;
+        }
+
         const script = document.createElement('script');
+        script.id = scriptId;
         script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`;
         script.async = true;
         script.defer = true;
+        script.onload = handleRecaptchaLoad; // Set callback for when script is loaded
         document.head.appendChild(script);
 
         return () => {
-            // Clean up script and badge on component unmount
-            document.head.removeChild(script);
-            const badge = document.querySelector('.grecaptcha-badge');
-            if (badge && badge.parentElement) {
-                badge.parentElement.removeChild(badge);
-            }
+            // The script can be left in the head to avoid re-loading on navigation.
+            // The reCAPTCHA badge is CSS-based and will manage its own visibility.
         };
     }, []);
 
@@ -114,23 +129,16 @@ const PreOrderSection: React.FC = () => {
         const formErrors = validate();
         setErrors(formErrors);
         if (Object.keys(formErrors).length > 0) return;
-        if (isLoading) return;
+        if (isLoading || !isRecaptchaReady) return;
 
         setIsLoading(true);
 
-        if (!recaptchaSiteKey || typeof grecaptcha === 'undefined') {
-            setSubmitError('reCAPTCHA is not configured or loaded. Please try again.');
-            setIsLoading(false);
-            return;
-        }
-        
         try {
+            // We can now assume grecaptcha is available because the button was enabled.
             const token = await new Promise<string>((resolve, reject) => {
-                grecaptcha.ready(() => {
-                    grecaptcha.execute(recaptchaSiteKey, { action: 'submit_order' })
-                        .then(resolve)
-                        .catch(reject);
-                });
+                grecaptcha.execute(recaptchaSiteKey, { action: 'submit_order' })
+                    .then(resolve)
+                    .catch(reject);
             });
 
             if (!token) {
@@ -158,7 +166,8 @@ const PreOrderSection: React.FC = () => {
             window.scrollTo(0, 0);
 
         } catch (error: any) {
-            setSubmitError(error.message);
+            console.error("Submission error:", error);
+            setSubmitError(error.message || 'An unexpected error occurred.');
         } finally {
             setIsLoading(false);
         }
@@ -304,7 +313,7 @@ const PreOrderSection: React.FC = () => {
                                         )}
                                         <button
                                             type="submit"
-                                            disabled={isLoading || isFormInvalid}
+                                            disabled={isLoading || isFormInvalid || !isRecaptchaReady}
                                             className="w-full bg-coral text-white font-bold py-3 px-8 rounded-md text-lg shadow-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 ease-in-out flex justify-center items-center disabled:opacity-75 disabled:cursor-not-allowed disabled:hover:scale-100"
                                         >
                                             {isLoading ? (
@@ -316,7 +325,7 @@ const PreOrderSection: React.FC = () => {
                                                     Submitting...
                                                 </>
                                             ) : (
-                                                'Submit Your Details'
+                                                !isRecaptchaReady ? 'Initializing Security...' : 'Submit Your Details'
                                             )}
                                         </button>
                                         <p className="text-xs text-center text-gray-500 mt-4">

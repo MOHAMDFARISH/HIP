@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 // FIX: Added optional chaining to prevent runtime errors if import.meta.env is not defined.
 const bankName = (import.meta as any)?.env?.VITE_BANK_NAME || 'Bank of Maldives';
 const accountHolderName = (import.meta as any)?.env?.VITE_ACCOUNT_HOLDER_NAME || 'Mariyam Hawla';
-const usdAccountNumber = (import.meta as any)?.env?.VITE_USD_ACCOUNT_NUMBER || '7770000081709';
+const usdAccountNumber = (import.meta as any)?.env?.VITE_USD_ACCOUNT_NUMBER || '7730000782664';
 const mvrAccountNumber = (import.meta as any)?.env?.VITE_MVR_ACCOUNT_NUMBER || '7704240648101';
 const priceDetails = (import.meta as any)?.env?.VITE_PRICE_DETAILS || '$25 / MVR 369';
 

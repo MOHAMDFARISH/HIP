@@ -4,52 +4,40 @@ import { nanoid } from 'nanoid';
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY!;
-
-async function verifyRecaptcha(token: string): Promise<boolean> {
-    if (!recaptchaSecretKey) {
-        console.error("RECAPTCHA_SECRET_KEY environment variable is not set.");
-        // Fail closed for security
-        return false;
-    }
-    
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `secret=${recaptchaSecretKey}&response=${token}`,
-    });
-
-    const data = await response.json();
-    
-    // For v3, we check for success AND a reasonable score.
-    // A score below 0.5 is often considered suspicious by Google.
-    if (data.success && data.score >= 0.5) {
-        console.log(`reCAPTCHA verification successful with score: ${data.score}`);
-        return true;
-    } else {
-        console.warn('reCAPTCHA verification failed or score was too low.', data);
-        return false;
-    }
-}
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    try {
-        const { fullName, email, phone, shippingAddress, copies, joinEvent, bringGuest, token } = req.body;
+    if (!recaptchaSecretKey) {
+        console.error('RECAPTCHA_SECRET_KEY is not configured on the server.');
+        return res.status(500).json({ message: 'Server configuration error.' });
+    }
 
-        if (!token) {
+    try {
+        const { fullName, email, phone, shippingAddress, copies, joinEvent, bringGuest, recaptchaToken } = req.body;
+
+        // 1. reCAPTCHA Verification
+        if (!recaptchaToken) {
             return res.status(400).json({ message: 'reCAPTCHA token is missing.' });
         }
 
-        const isHuman = await verifyRecaptcha(token);
-        if (!isHuman) {
-            return res.status(403).json({ message: 'reCAPTCHA verification failed. Are you a robot?' });
+        const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `secret=${recaptchaSecretKey}&response=${recaptchaToken}`,
+        });
+        const recaptchaData = await recaptchaResponse.json();
+
+        if (!recaptchaData.success || recaptchaData.score < 0.5 || recaptchaData.action !== 'submit_order') {
+            console.warn('reCAPTCHA verification failed:', recaptchaData);
+            return res.status(403).json({ message: 'Bot detection failed. Please refresh and try again.' });
         }
 
+        // 2. Form Data Validation
         if (!fullName || !email || !phone || !shippingAddress) {
             return res.status(400).json({ message: 'Missing required fields.' });
         }
@@ -59,6 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(400).json({ message: 'Invalid number of copies.' });
         }
 
+        // 3. Database Insertion
         const trackingNumber = `HIP-2025-${nanoid(5).toUpperCase()}`;
 
         const { error: dbError } = await supabase.from('orders').insert({

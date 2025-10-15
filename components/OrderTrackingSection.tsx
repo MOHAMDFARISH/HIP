@@ -27,13 +27,18 @@ const getStatusMessage = (status: string) => {
         },
         confirmed: {
             title: '✅ Order Confirmed',
-            message: 'Your payment is verified! We\'ll notify you when your book ships.',
+            message: 'Your payment is verified! We\'ll notify you when your book ships or is ready for pickup.',
             color: 'blue'
+        },
+        ready_for_pickup: {
+            title: '🎁 Ready for Pickup',
+            message: 'Your book is ready for collection at the book signing event. See you there!',
+            color: 'purple'
         },
         shipped: {
             title: '📦 Shipped',
             message: 'Your book is on the way! Delivery starts after October 28, 2025.',
-            color: 'purple'
+            color: 'teal'
         },
         delivered: {
             title: '🎉 Delivered',
@@ -62,6 +67,7 @@ const OrderStatusDisplay: React.FC<{ status: string }> = ({ status }) => {
         yellow: { bg: 'bg-yellow-100', border: 'border-yellow-300', text: 'text-yellow-800' },
         blue: { bg: 'bg-blue-100', border: 'border-blue-300', text: 'text-blue-800' },
         purple: { bg: 'bg-purple-100', border: 'border-purple-300', text: 'text-purple-800' },
+        teal: { bg: 'bg-teal-100', border: 'border-teal-300', text: 'text-teal-800' },
         green: { bg: 'bg-green-100', border: 'border-green-300', text: 'text-green-800' },
         red: { bg: 'bg-red-100', border: 'border-red-300', text: 'text-red-800' },
     };

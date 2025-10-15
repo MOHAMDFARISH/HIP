@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PaymentDetails from './PaymentDetails';
-import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
-// SECURITY UPDATE: Removed hardcoded fallback test key. The application will now fail safely
-// if the environment variable is not provided, preventing insecure deployments.
-// FIX: Cast `import.meta` to `any` and use optional chaining to resolve TypeScript error with Vite environment variables.
-const RECAPTCHA_SITE_KEY = (import.meta as any)?.env?.VITE_RECAPTCHA_SITE_KEY;
+// Define grecaptcha from the reCAPTCHA script
+declare const grecaptcha: any;
+// FIX: Added optional chaining to prevent runtime errors if import.meta.env is not defined.
+const recaptchaSiteKey = (import.meta as any)?.env?.VITE_RECAPTCHA_SITE_KEY || '';
+
 
 // Checkmark icon for valid fields
 const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -29,7 +29,7 @@ const CalendarIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-const PreOrderForm: React.FC = () => {
+const PreOrderSection: React.FC = () => {
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -45,9 +45,29 @@ const PreOrderForm: React.FC = () => {
     const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
     const [orderSubmitted, setOrderSubmitted] = useState(false);
     const [submittedTrackingNumber, setSubmittedTrackingNumber] = useState<string | null>(null);
-    
-    const { executeRecaptcha } = useGoogleReCaptcha();
    
+    // Dynamically load the reCAPTCHA script
+    useEffect(() => {
+        if (!recaptchaSiteKey) {
+            console.warn('reCAPTCHA V3 site key is not configured.');
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+
+        return () => {
+            // Clean up script and badge on component unmount
+            document.head.removeChild(script);
+            const badge = document.querySelector('.grecaptcha-badge');
+            if (badge && badge.parentElement) {
+                badge.parentElement.removeChild(badge);
+            }
+        };
+    }, []);
+
     const validate = useCallback(() => {
         const newErrors: { [key: string]: string } = {};
         if (!formData.fullName.trim()) newErrors.fullName = 'Full Name is required.';
@@ -92,29 +112,34 @@ const PreOrderForm: React.FC = () => {
             fullName: true, email: true, phone: true,
             shippingAddress: true, copies: true
         });
-        
         const formErrors = validate();
         setErrors(formErrors);
         if (Object.keys(formErrors).length > 0) return;
-
         if (isLoading) return;
+
         setIsLoading(true);
-        
-        if (!executeRecaptcha) {
-            setSubmitError("reCAPTCHA not ready. Please try again in a moment.");
+
+        if (!recaptchaSiteKey || typeof grecaptcha === 'undefined') {
+            setSubmitError('reCAPTCHA is not configured or loaded. Please try again.');
             setIsLoading(false);
             return;
         }
         
-        const token = await executeRecaptcha('submitOrder');
-        // DEBUG: Log the token to the console to verify it's being generated.
-        console.log('Generated reCAPTCHA token:', token);
-        
         try {
+            const token = await new Promise<string>((resolve, reject) => {
+                grecaptcha.ready(() => {
+                    grecaptcha.execute(recaptchaSiteKey, { action: 'submit_order' })
+                        .then(resolve)
+                        .catch(reject);
+                });
+            });
+            
             const response = await fetch('/api/submit-order', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formData, token }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ...formData, recaptchaToken: token }),
             });
 
             const result = await response.json();
@@ -290,9 +315,9 @@ const PreOrderForm: React.FC = () => {
                                             )}
                                         </button>
                                         <p className="text-xs text-center text-gray-500 mt-4">
-                                            This site is protected by reCAPTCHA and the Google 
-                                            <a href="https://policies.google.com/privacy" className="underline"> Privacy Policy</a> and 
-                                            <a href="https://policies.google.com/terms" className="underline"> Terms of Service</a> apply.
+                                            This site is protected by reCAPTCHA and the Google
+                                            <a href="https://policies.google.com/privacy" className="underline hover:text-coral"> Privacy Policy</a> and
+                                            <a href="https://policies.google.com/terms" className="underline hover:text-coral"> Terms of Service</a> apply.
                                         </p>
                                     </div>
                                 </form>
@@ -303,31 +328,6 @@ const PreOrderForm: React.FC = () => {
                 </div>
             </div>
         </section>
-    );
-};
-
-const PreOrderSection: React.FC = () => {
-    // If the site key isn't available, render an error message to prevent
-    // the form from being used in an insecure or non-functional state.
-    if (!RECAPTCHA_SITE_KEY) {
-        return (
-            <section className="py-16 md:py-24">
-                <div className="container mx-auto px-6 text-center">
-                    <div className="max-w-2xl mx-auto p-8 bg-red-50 border border-red-200 rounded-lg">
-                        <h2 className="text-2xl font-bold text-red-700">Configuration Error</h2>
-                        <p className="text-red-600 mt-2">
-                            The reCAPTCHA Site Key is not configured correctly. The pre-order form cannot be displayed.
-                        </p>
-                    </div>
-                </div>
-            </section>
-        );
-    }
-
-    return (
-        <GoogleReCaptchaProvider reCaptchaKey={RECAPTCHA_SITE_KEY}>
-            <PreOrderForm />
-        </GoogleReCaptchaProvider>
     );
 };
 

@@ -38,7 +38,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setActivePage }) => {
             className="w-48 md:w-64 rounded-lg shadow-2xl transform hover:scale-105 transition-transform duration-300"
             width="256"
             height="384"
-            // FIX: The `fetchpriority` attribute should be camelCased to `fetchPriority` in React/JSX.
             fetchPriority="high"
           />
           <div className="absolute top-[-17px] right-[-17px]">

@@ -46,39 +46,44 @@ const PreOrderSection: React.FC = () => {
     const [submittedTrackingNumber, setSubmittedTrackingNumber] = useState<string | null>(null);
     const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
    
-    // Dynamically load the reCAPTCHA script and set a 'ready' state
+    // Dynamically load the reCAPTCHA script using the recommended onload callback
     useEffect(() => {
         if (!recaptchaSiteKey) {
             console.warn('reCAPTCHA V3 site key is not configured.');
             return;
         }
         const scriptId = 'recaptcha-v3-script';
+        const callbackName = 'onRecaptchaLoadCallback';
 
-        const handleRecaptchaLoad = () => {
+        // If the script is already loaded, just set the ready state
+        if (document.getElementById(scriptId)) {
+            if (typeof grecaptcha !== 'undefined') {
+                grecaptcha.ready(() => setIsRecaptchaReady(true));
+            }
+            return;
+        }
+
+        // Define the global callback function that the reCAPTCHA script will call
+        (window as any)[callbackName] = () => {
             if (typeof grecaptcha !== 'undefined') {
                 grecaptcha.ready(() => {
                     setIsRecaptchaReady(true);
                 });
             }
         };
-        
-        // If script already exists, just trigger the ready state handler
-        if (document.getElementById(scriptId)) {
-            handleRecaptchaLoad();
-            return;
-        }
 
         const script = document.createElement('script');
         script.id = scriptId;
-        script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`;
+        script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}&onload=${callbackName}`;
         script.async = true;
         script.defer = true;
-        script.onload = handleRecaptchaLoad; // Set callback for when script is loaded
         document.head.appendChild(script);
 
+        // Cleanup function to remove the global callback
         return () => {
-            // The script can be left in the head to avoid re-loading on navigation.
-            // The reCAPTCHA badge is CSS-based and will manage its own visibility.
+            if ((window as any)[callbackName]) {
+                delete (window as any)[callbackName];
+            }
         };
     }, []);
 

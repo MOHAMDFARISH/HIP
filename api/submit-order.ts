@@ -5,6 +5,33 @@ import { nanoid } from 'nanoid';
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY!;
+
+async function verifyRecaptcha(token: string): Promise<boolean> {
+    if (!recaptchaSecretKey) {
+        console.error("RECAPTCHA_SECRET_KEY environment variable is not set.");
+        // Fail closed for security
+        return false;
+    }
+    
+    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `secret=${recaptchaSecretKey}&response=${token}`,
+    });
+
+    const data = await response.json();
+    
+    // For v3, we check for success AND a reasonable score.
+    // A score below 0.5 is often considered suspicious by Google.
+    if (data.success && data.score >= 0.5) {
+        console.log(`reCAPTCHA verification successful with score: ${data.score}`);
+        return true;
+    } else {
+        console.warn('reCAPTCHA verification failed or score was too low.', data);
+        return false;
+    }
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'POST') {
@@ -12,7 +39,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-        const { fullName, email, phone, shippingAddress, copies, joinEvent, bringGuest } = req.body;
+        const { fullName, email, phone, shippingAddress, copies, joinEvent, bringGuest, token } = req.body;
+
+        if (!token) {
+            return res.status(400).json({ message: 'reCAPTCHA token is missing.' });
+        }
+
+        const isHuman = await verifyRecaptcha(token);
+        if (!isHuman) {
+            return res.status(403).json({ message: 'reCAPTCHA verification failed. Are you a robot?' });
+        }
 
         if (!fullName || !email || !phone || !shippingAddress) {
             return res.status(400).json({ message: 'Missing required fields.' });

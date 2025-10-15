@@ -13,7 +13,8 @@
     "react": "^19.1.1",
     "@supabase/supabase-js": "^2.58.0",
     "nanoid": "^5.1.6",
-    "@vercel/node": "^5.3.26"
+    "@vercel/node": "^5.3.26",
+    "react-google-recaptcha-v3": "^1.10.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

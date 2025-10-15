@@ -3,8 +3,7 @@ import PaymentDetails from './PaymentDetails';
 
 // Define grecaptcha from the reCAPTCHA script
 declare const grecaptcha: any;
-// FIX: Added optional chaining to prevent runtime errors if import.meta.env is not defined.
-const recaptchaSiteKey = (import.meta as any)?.env?.VITE_RECAPTCHA_SITE_KEY || '';
+const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
 
 
 // Checkmark icon for valid fields
@@ -133,6 +132,12 @@ const PreOrderSection: React.FC = () => {
                         .catch(reject);
                 });
             });
+
+            if (!token) {
+                setSubmitError("Failed to get reCAPTCHA verification. Please refresh and try again.");
+                setIsLoading(false);
+                return;
+            }
             
             const response = await fetch('/api/submit-order', {
                 method: 'POST',

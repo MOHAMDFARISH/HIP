@@ -1,8 +1,7 @@
 import React from 'react';
 import { FacebookIcon, InstagramIcon, XIcon, TikTokIcon, ThreadsIcon, LinktreeIcon } from './icons/SocialIcons';
 
-// FIX: Added optional chaining to prevent runtime errors if import.meta.env is not defined.
-const contactEmail = (import.meta as any)?.env?.VITE_CONTACT_EMAIL || 'hello@hawlariza.com';
+const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || 'hello@hawlariza.com';
 
 const ContactSection: React.FC = () => {
   return (

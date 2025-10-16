@@ -1,9 +1,8 @@
 import React from 'react';
-import { Page } from '../types';
 import { FacebookIcon, InstagramIcon, XIcon, TikTokIcon, ThreadsIcon, LinktreeIcon } from './icons/SocialIcons';
 
 interface FooterProps {
-  setActivePage: (page: Page) => void;
+  navigate: (path: string) => void;
 }
 
 const contactEmail = import.meta.env.VITE_CONTACT_EMAIL || 'hello@hawlariza.com';
@@ -20,27 +19,36 @@ const EmailIcon: React.FC = () => (
     </svg>
 );
 
-const FooterNavLink: React.FC<{ page: Page; onClick: (page: Page) => void; children: React.ReactNode }> = ({ page, onClick, children }) => (
+interface NavLinkInfo {
+  path: string;
+  label: string;
+}
+
+const FooterNavLink: React.FC<{ link: NavLinkInfo; onClick: (path: string) => void; children: React.ReactNode }> = ({ link, onClick, children }) => (
   <li>
-    <button
-      onClick={() => onClick(page)}
+    <a
+      href={link.path}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick(link.path);
+      }}
       className="text-dark-slate/80 hover:text-coral hover:underline font-normal transition-all duration-300 transform hover:translate-x-1"
     >
       {children}
-    </button>
+    </a>
   </li>
 );
 
-const Footer: React.FC<FooterProps> = ({ setActivePage }) => {
-  const navLinks: Page[] = [
-    Page.Home,
-    Page.AboutTheBook,
-    Page.MeetHawlaRiza,
-    Page.PoetrySamples,
-    Page.PreOrder,
-    Page.OrderTracking,
-    Page.FAQ,
-    Page.Contact,
+const Footer: React.FC<FooterProps> = ({ navigate }) => {
+  const navLinks: NavLinkInfo[] = [
+    { path: '/', label: 'Home' },
+    { path: '/heal-in-paradise', label: 'About the Book' },
+    { path: '/about-hawla-riza', label: 'Meet Hawla Riza' },
+    { path: '/poetry-samples', label: 'Poetry Samples' },
+    { path: '/pre-order-heal-in-paradise', label: 'Pre-Order' },
+    { path: '/track-order', label: 'Track Order' },
+    { path: '/faq', label: 'FAQ' },
+    { path: '/contact', label: 'Contact' },
   ];
   
   return (
@@ -108,9 +116,9 @@ const Footer: React.FC<FooterProps> = ({ setActivePage }) => {
           <div className="md:justify-self-end bg-sand/50 p-6 rounded-lg">
             <h3 className="font-heading text-xl font-medium text-dark-slate mb-5 text-center md:text-left">Quick Links</h3>
             <ul className="space-y-4 flex flex-col items-center md:items-start">
-              {navLinks.map(page => (
-                <FooterNavLink key={page} page={page} onClick={setActivePage}>
-                  {page}
+              {navLinks.map(link => (
+                <FooterNavLink key={link.path} link={link} onClick={navigate}>
+                  {link.label}
                 </FooterNavLink>
               ))}
             </ul>

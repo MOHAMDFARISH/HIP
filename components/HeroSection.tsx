@@ -1,8 +1,7 @@
 import React from 'react';
-import { Page } from '../types';
 
 interface HeroSectionProps {
-  setActivePage: (page: Page) => void;
+  navigate: (path: string) => void;
 }
 
 // Performance Optimization: Generate responsive image sources for Cloudinary
@@ -13,7 +12,7 @@ const bookCoverSrcSet = [300, 400, 600]
   .map(w => `${bookCoverBaseUrl}/f_auto,q_auto,w_${w}/${bookCoverId} ${w}w`)
   .join(', ');
 
-const HeroSection: React.FC<HeroSectionProps> = ({ setActivePage }) => {
+const HeroSection: React.FC<HeroSectionProps> = ({ navigate }) => {
   return (
     <section className="relative min-h-[calc(100vh-80px)] flex items-center justify-center text-center text-white py-20 px-4 overflow-hidden">
       <div className="flex flex-col items-center">
@@ -53,7 +52,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setActivePage }) => {
         </div>
         
         <button 
-          onClick={() => setActivePage(Page.PreOrder)}
+          onClick={() => navigate('/pre-order-heal-in-paradise')}
           className="mt-8 bg-coral text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 ease-in-out"
         >
           Pre-Order Your Copy Today

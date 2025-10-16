@@ -23,7 +23,7 @@ const faqData = [
     },
     {
         question: "What is the book about?",
-        answer: "The book is an intimate odyssey into the heart of the Maldives. Through a collection of poignant poems, it weaves tales of resilience, love, pain, and the healing power of nature and self-discovery."
+        answer: "The book is an intimate journey into the heart of the Maldives. Through a collection of poignant poems, it weaves tales of resilience, love, pain, and the healing power of nature and self-discovery."
     },
     {
         question: "Is this available as an ebook?",

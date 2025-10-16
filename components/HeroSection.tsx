@@ -20,10 +20,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ navigate }) => {
           HEAL IN PARADISE
         </h1>
         <p className="mt-4 text-2xl md:text-3xl max-w-3xl font-heading italic [text-shadow:0_1px_3px_rgba(0,0,0,0.5)]">
-          A Collection of Poems from the Maldives
+          Collection of poems from the Maldives
         </p>
         <p className="mt-6 text-base md:text-lg max-w-3xl font-normal [text-shadow:0_2px_4px_rgba(0,0,0,0.5)] leading-relaxed">
-          Discover the 1st Maldivian literary souvenir by Hawla Riza.
+          Discover the 1st Maldivian literary souvenir.
           <br />
           A journey of hope, healing, and the serene beauty of the islands.
         </p>

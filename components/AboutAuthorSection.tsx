@@ -42,12 +42,23 @@ const AboutAuthorSection: React.FC = () => {
               <p className="text-xl font-semibold font-heading text-coral mb-6">
                 The Voice Behind Heal in Paradise
               </p>
-              <p className="mb-6 text-dark-slate/80 leading-relaxed">
-                Hawla Riza is a Maldivian poet whose words breathe authentic island life and experience. Her journey of Maldivian heritage, deeply breathing its culture, and vibrant lands, scapes, and umami split and people. Hawla believes of ir heal, inspire, making grd power of her profound artistry and genuine heart.
-              </p>
-              <p className="text-dark-slate/80 leading-relaxed">
-                This collection is her authentic voice, an essence where the island life and experience come alive through her words.
-              </p>
+              <div className="space-y-4 text-dark-slate/80 leading-relaxed">
+                  <p>
+                      Hawla Riza is a Maldivian poet who writes with an authentic voice.
+                  </p>
+                  <p>
+                      <strong>HEAL IN PARADISE</strong> is her debut collection, meant to be read by the healing shores of her beautiful homeland, the Maldives. Her unflinching words confront the raw truths of life and guide readers through pain toward healing.
+                  </p>
+                  <p>
+                      Her poetry has been published on international platforms, exploring themes of love, grief, beauty, and resilience. Much like the coral atolls that rise from deep waters to create harmony, her words emerge from profound depths to create meaning.
+                  </p>
+                  <p>
+                      This collection is, in her own words, <em className="italic">"a souvenir of my soul and home, dripping with essence of all I am."</em>
+                  </p>
+                  <p>
+                      When not writing, she finds inspiration observing how sunshine and moonlight dance across the shores and palm fronds of her island home. She dreams of travelers carrying these words with them long after they leave paradise.
+                  </p>
+              </div>
               <div className="mt-8">
                 <a href="https://linktr.ee/hawlariza" target="_blank" rel="noopener noreferrer" className="inline-block bg-coral text-white font-bold py-3 px-6 rounded-md shadow-md hover:bg-opacity-90 transition-all duration-300">
                   Follow Hawla on Social Media

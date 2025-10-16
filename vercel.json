@@ -1,7 +1,10 @@
 {
   "rewrites": [
     {
-      "source": "/((?!api/|.*\\..*).*)",
+      "source": "/(.*)",
+      "missing": [
+        { "type": "destination" }
+      ],
       "destination": "/index.html"
     }
   ]

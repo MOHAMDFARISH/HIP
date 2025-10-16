@@ -1,4 +1,5 @@
 import React from 'react';
+import ShareButtons from './ShareButtons';
 
 // Performance Optimization: Generate responsive image sources for Cloudinary
 const bookCoverBaseUrl = "https://res.cloudinary.com/dmtolfhsv/image/upload";
@@ -84,6 +85,9 @@ const AboutBookSection: React.FC = () => {
                                 <FeatureItem icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>} text="Profound themes of hope, healing, and self-discovery that resonate with readers worldwide." />
                                 <FeatureItem icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L16.732 3.732z" /></svg>} text="Exquisite watercolor illustrations that bring the poetry to life with vibrant, tropical beauty." />
                                 <FeatureItem icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>} text="The perfect literary souvenir, capturing the timeless spirit and soul of the Maldives." />
+                            </div>
+                            <div className="mt-12 pt-8 border-t border-coral/20">
+                                <ShareButtons />
                             </div>
                         </div>
                     </div>

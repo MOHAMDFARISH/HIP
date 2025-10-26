@@ -37,7 +37,7 @@ const getStatusMessage = (status: string) => {
         },
         shipped: {
             title: '📦 Shipped',
-            message: 'Your book is on the way! Delivery starts after October 28, 2025.',
+            message: 'Your book is on the way! Delivery starts after November 4, 2025.',
             color: 'teal'
         },
         delivered: {
@@ -245,7 +245,7 @@ const OrderTrackingSection: React.FC = () => {
                     </div>
                     <div className="mt-8 pt-6 border-t border-coral/30">
                         <h4 className="font-heading text-xl font-semibold text-dark-slate mb-4 text-center">Estimated Timeline</h4>
-                        <p className="text-center text-dark-slate/80 text-sm">Pre-order deliveries will commence after the book signing event on <strong>October 28th, 2025</strong>.</p>
+                        <p className="text-center text-dark-slate/80 text-sm">Pre-order deliveries will commence after the book signing event on <strong>November 4th, 2025</strong>.</p>
                     </div>
                 </div>
             );

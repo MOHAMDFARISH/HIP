@@ -285,7 +285,7 @@ const PreOrderSection: React.FC = () => {
                                     <fieldset className="p-6 border-2 border-coral/40 rounded-lg bg-coral/10 space-y-4 shadow-md transition-all hover:shadow-lg">
                                         <div className="flex items-center gap-3">
                                             <CalendarIcon />
-                                            <legend className="font-heading text-xl font-bold text-dark-slate">Exclusive Book Signing <span className="text-coral">(OCT 28, 2025)</span></legend>
+                                            <legend className="font-heading text-xl font-bold text-dark-slate">Exclusive Book Signing <span className="text-coral">(NOV 04, 2025)</span></legend>
                                         </div>
                                         <p className="text-dark-slate/80 text-sm pl-9">Be part of the official launch! Register your interest now to receive an exclusive invitation.</p>
                                         <div className="mt-4 pl-9">

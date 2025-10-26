@@ -65,11 +65,11 @@ export const CustomerConfirmationEmail = ({
             <Text className="text-[14px] leading-[22px] m-0"><strong>Tracking Number:</strong> <span className="font-mono text-coral">{trackingNumber}</span></Text>
             <Text className="text-[14px] leading-[22px] m-0"><strong>Copies:</strong> {copies}</Text>
             <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Shipping Address:</strong><br/>{shippingAddress.split('\n').map((line, i) => <span key={i}>{line}<br/></span>)}</Text>
-             <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Book Signing Event (Oct 28):</strong> {eventDetails}</Text>
+             <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Book Signing Event (Nov 4):</strong> {eventDetails}</Text>
           </Section>
           
           <Text className="text-dark-slate text-[16px] leading-[24px]">
-            You can use your tracking number on our website to check the status of your submission. Please note that deliveries will commence after the official book launch on October 28th, 2025.
+            You can use your tracking number on our website to check the status of your submission. Please note that deliveries will commence after the official book launch on November 4th, 2025.
           </Text>
           
           <Hr className="border border-solid border-coral/20 my-[26px] mx-0 w-full" />

@@ -22,7 +22,7 @@ const bookSpecs = [
     { label: 'Pages', value: '61' },
     { label: 'Dimensions', value: '5.5" x 8.5"' },
     { label: 'Language', value: 'English' },
-    { label: 'Publication Date', value: 'October 2025' },
+    { label: 'Publication Date', value: 'November 2025' },
 ];
 
 const AboutBookSection: React.FC = () => {

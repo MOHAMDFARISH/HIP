@@ -15,7 +15,7 @@ const faqData = [
     },
     {
         question: "When will the book be released?",
-        answer: "The official release and book signing event is scheduled for October 28, 2025. Orders will be shipped shortly after this date."
+        answer: "The official release and book signing event is scheduled for November 4, 2025. Orders will be shipped shortly after this date."
     },
     {
         question: "How can I order Heal in Paradise?",
@@ -31,7 +31,7 @@ const faqData = [
     },
     {
         question: "Where can I get Heal in Paradise in the Maldives?",
-        answer: "After the official launch on October 28, 2025, the book will be available at select local bookstores and gift shops in the Maldives. The best way to guarantee a copy is to order through this website."
+        answer: "After the official launch on November 4, 2025, the book will be available at select local bookstores and gift shops in the Maldives. The best way to guarantee a copy is to order through this website."
     }
 ];
 

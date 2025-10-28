@@ -45,6 +45,7 @@ const PreOrderSection: React.FC = () => {
     const [orderSubmitted, setOrderSubmitted] = useState(false);
     const [submittedTrackingNumber, setSubmittedTrackingNumber] = useState<string | null>(null);
     const [isRecaptchaReady, setIsRecaptchaReady] = useState(false);
+    const [showEventSignup, setShowEventSignup] = useState(false);
    
     // Dynamically load the reCAPTCHA script using the recommended onload callback
     useEffect(() => {
@@ -85,6 +86,15 @@ const PreOrderSection: React.FC = () => {
                 delete (window as any)[callbackName];
             }
         };
+    }, []);
+
+    // Check if the book signing event signup should be displayed
+    useEffect(() => {
+        const cutoffDate = new Date('2025-11-01T00:00:00Z'); // November 1st, 2025, 00:00:00 UTC
+        const currentDate = new Date();
+        if (currentDate < cutoffDate) {
+            setShowEventSignup(true);
+        }
     }, []);
 
     const validate = useCallback(() => {
@@ -282,6 +292,7 @@ const PreOrderSection: React.FC = () => {
                                         </div>
                                     </fieldset>
                                     
+                                    {showEventSignup && (
                                     <fieldset className="p-6 border-2 border-coral/40 rounded-lg bg-coral/10 space-y-4 shadow-md transition-all hover:shadow-lg">
                                         <div className="flex items-center gap-3">
                                             <CalendarIcon />
@@ -309,6 +320,7 @@ const PreOrderSection: React.FC = () => {
                                             </div>
                                         )}
                                     </fieldset>
+                                    )}
                                     
                                     <div>
                                         {submitError && (

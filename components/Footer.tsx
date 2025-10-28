@@ -45,7 +45,7 @@ const Footer: React.FC<FooterProps> = ({ navigate }) => {
     { path: '/heal-in-paradise', label: 'About the Book' },
     { path: '/about-hawla-riza', label: 'Meet Hawla Riza' },
     { path: '/poetry-samples', label: 'Poetry Samples' },
-    { path: '/pre-order-heal-in-paradise', label: 'Pre-Order' },
+    { path: '/order-heal-in-paradise', label: 'Order Now' },
     { path: '/track-order', label: 'Track Order' },
     { path: '/faq', label: 'FAQ' },
     { path: '/contact', label: 'Contact' },

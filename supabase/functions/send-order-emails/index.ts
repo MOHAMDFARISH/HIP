@@ -36,7 +36,7 @@ serve(async (req: Request) => {
         await resend.emails.send({
           from: 'Heal in Paradise <orders@healinparadise.com>',
           to: order.customer_email,
-          subject: `Action Required: Complete Your 'Heal in Paradise' Pre-Order #${order.tracking_number}`,
+          subject: `Action Required: Complete Your 'Heal in Paradise' Order #${order.tracking_number}`,
           react: OrderConfirmedEmail({
               customerName: order.customer_name,
               trackingNumber: order.tracking_number
@@ -61,12 +61,12 @@ serve(async (req: Request) => {
           resend.emails.send({
               from: 'Heal in Paradise <orders@healinparadise.com>',
               to: order.customer_email,
-              subject: `Submission Received for 'Heal in Paradise' Pre-Order #${order.tracking_number}`,
+              subject: `Submission Received for 'Heal in Paradise' Order #${order.tracking_number}`,
               react: CustomerConfirmationEmail(commonEmailProps),
           }),
           // 2. Send notification email to the admin
           resend.emails.send({
-              from: `New Pre-Order <system@healinparadise.com>`,
+              from: `New Order <system@healinparadise.com>`,
               to: adminEmail,
               subject: `Receipt Uploaded: ${order.customer_name} (#${order.tracking_number})`,
               react: AdminNotificationEmail({

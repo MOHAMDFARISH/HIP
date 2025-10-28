@@ -36,15 +36,15 @@ export const AdminNotificationEmail = ({
 }: EmailProps) => (
   <Html>
     <Head />
-    <Preview>New Pre-Order Received: {customerName}</Preview>
+    <Preview>New Order Received: {customerName}</Preview>
     <Tailwind>
       <Body className="bg-gray-100 my-auto mx-auto font-sans">
         <Container className="border border-solid border-gray-300 rounded my-[40px] mx-auto p-[20px] max-w-[600px] bg-white">
           <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
-            New Pre-Order Notification
+            New Order Notification
           </Heading>
           <Text className="text-black text-[14px] leading-[24px]">
-            A new pre-order has been placed for 'Heal in Paradise'.
+            A new order has been placed for 'Heal in Paradise'.
           </Text>
           <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
           <Section>

@@ -52,10 +52,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ navigate }) => {
         </div>
         
         <button 
-          onClick={() => navigate('/pre-order-heal-in-paradise')}
+          onClick={() => navigate('/order-heal-in-paradise')}
           className="mt-8 bg-coral text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 ease-in-out"
         >
-          Pre-Order Your Copy Today
+          Order Your Copy Today
         </button>
       </div>
     </section>

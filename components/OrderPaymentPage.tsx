@@ -123,7 +123,7 @@ const OrderPaymentPage: React.FC<OrderPaymentPageProps> = ({ trackingNumber }) =
             return (
                 <>
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Complete Your Pre-Order</h2>
+                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Complete Your Order</h2>
                         <p className="mt-4 text-lg text-dark-slate/70">
                             Welcome, {orderData.customer_name}. Please finalize your order below.
                         </p>

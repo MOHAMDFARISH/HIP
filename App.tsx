@@ -29,8 +29,8 @@ const App: React.FC = () => {
         '/heal-in-paradise': 'About the Book | Heal in Paradise by Hawla Riza',
         '/about-hawla-riza': 'About Hawla Riza | Author of Heal in Paradise',
         '/poetry-samples': 'Poetry Samples | Heal in Paradise by Hawla Riza',
-        '/pre-order-heal-in-paradise': "Pre-Order 'Heal in Paradise' by Hawla Riza",
-        '/track-order': "Track Your 'Heal in Paradise' Pre-Order",
+        '/order-heal-in-paradise': "Order 'Heal in Paradise' by Hawla Riza",
+        '/track-order': "Track Your 'Heal in Paradise' Order",
         '/faq': 'FAQ | Heal in Paradise',
         '/contact': 'Contact | Heal in Paradise',
     };
@@ -64,7 +64,7 @@ const App: React.FC = () => {
         return <AuthorPage />;
       case '/poetry-samples':
         return <PoetrySamplesPage />;
-      case '/pre-order-heal-in-paradise':
+      case '/order-heal-in-paradise':
         return <PreOrderPage />;
       case '/track-order':
         return <TrackOrderPage />;

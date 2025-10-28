@@ -15,11 +15,11 @@ const faqData = [
     },
     {
         question: "When will the book be released?",
-        answer: "The official release and book signing event is scheduled for November 4, 2025. Pre-orders will be shipped shortly after this date."
+        answer: "The official release and book signing event is scheduled for October 28, 2025. Orders will be shipped shortly after this date."
     },
     {
-        question: "How can I pre-order Heal in Paradise?",
-        answer: "You can secure your copy by visiting the 'Pre-Order' page on our website. Simply fill out your details, and you'll receive a link to complete your payment and finalize your order."
+        question: "How can I order Heal in Paradise?",
+        answer: "You can secure your copy by visiting the 'Order Now' page on our website. Simply fill out your details, and you'll receive a link to complete your payment and finalize your order."
     },
     {
         question: "What is the book about?",
@@ -31,7 +31,7 @@ const faqData = [
     },
     {
         question: "Where can I get Heal in Paradise in the Maldives?",
-        answer: "After the official launch on November 4, 2025, the book will be available at select local bookstores and gift shops in the Maldives. The best way to guarantee a copy is to pre-order through this website."
+        answer: "After the official launch on October 28, 2025, the book will be available at select local bookstores and gift shops in the Maldives. The best way to guarantee a copy is to order through this website."
     }
 ];
 
@@ -109,7 +109,7 @@ const FAQSection: React.FC = () => {
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Frequently Asked Questions</h2>
                         <p className="mt-4 text-lg text-dark-slate/70 max-w-2xl mx-auto">
-                            Find answers to common questions about 'Heal in Paradise' and the pre-ordering process.
+                            Find answers to common questions about 'Heal in Paradise' and the ordering process.
                         </p>
                     </div>
 

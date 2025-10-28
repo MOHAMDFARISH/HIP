@@ -37,7 +37,7 @@ const getStatusMessage = (status: string) => {
         },
         shipped: {
             title: '📦 Shipped',
-            message: 'Your book is on the way! Delivery starts after November 4, 2025.',
+            message: 'Your book is on the way! Delivery starts after October 28, 2025.',
             color: 'teal'
         },
         delivered: {
@@ -245,7 +245,7 @@ const OrderTrackingSection: React.FC = () => {
                     </div>
                     <div className="mt-8 pt-6 border-t border-coral/30">
                         <h4 className="font-heading text-xl font-semibold text-dark-slate mb-4 text-center">Estimated Timeline</h4>
-                        <p className="text-center text-dark-slate/80 text-sm">Pre-order deliveries will commence after the book signing event on <strong>November 4th, 2025</strong>.</p>
+                        <p className="text-center text-dark-slate/80 text-sm">Deliveries will commence after the book signing event on <strong>October 28th, 2025</strong>.</p>
                     </div>
                 </div>
             );
@@ -258,7 +258,7 @@ const OrderTrackingSection: React.FC = () => {
             <div className="container mx-auto px-6">
                 <div className="max-w-4xl mx-auto p-8 md:p-12 rounded-lg shadow-lg border border-coral/20" style={{ backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1920/v1758630320/Gemini_Generated_Image_v2lp4bv2lp4bv2lp_aookgo.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Track Your Pre-Order</h2>
+                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Track Your Order</h2>
                         <p className="mt-4 text-lg text-dark-slate/70">Enter your tracking number and email to check your order status or complete your payment.</p>
                     </div>
 

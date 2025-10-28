@@ -9,6 +9,7 @@ import {
   Preview,
   Section,
   Text,
+  Link,
   Tailwind,
 } from 'https://esm.sh/@react-email/components@0.0.15';
 import React from 'https://esm.sh/react@18.2.0';
@@ -16,23 +17,17 @@ import React from 'https://esm.sh/react@18.2.0';
 interface EmailProps {
   customerName: string;
   trackingNumber: string;
-  copies: number;
-  shippingAddress: string;
-  eventDetails: string;
 }
 
-const baseUrl = 'https://www.healinparadise.com'; // Replace with your live URL
+const baseUrl = 'https://www.healinparadise.com'; 
 
-export const CustomerConfirmationEmail = ({
+export const OrderConfirmedEmail = ({
   customerName,
   trackingNumber,
-  copies,
-  shippingAddress,
-  eventDetails
 }: EmailProps) => (
   <Html>
     <Head />
-    <Preview>Your 'Heal in Paradise' order submission has been received.</Preview>
+    <Preview>Action Required: Complete your 'Heal in Paradise' Order</Preview>
     <Tailwind>
       <Body className="bg-sand my-auto mx-auto font-sans">
         <Container className="border border-solid border-coral/30 rounded my-[40px] mx-auto p-[20px] max-w-[600px] bg-white">
@@ -45,31 +40,37 @@ export const CustomerConfirmationEmail = ({
               className="my-0 mx-auto"
             />
             <Heading className="text-dark-slate text-[28px] font-bold font-heading p-0 my-[30px] mx-0">
-              Your Order Submission is Received
+              Your Order Details are Saved!
             </Heading>
           </Section>
           <Text className="text-dark-slate text-[16px] leading-[24px]">
             Dear {customerName},
           </Text>
           <Text className="text-dark-slate text-[16px] leading-[24px]">
-            Thank you for submitting your order for 'Heal in Paradise'. This email is to confirm we have successfully received your submission.
+            Thank you for your order for 'Heal in Paradise'! Your order details have been successfully saved.
           </Text>
-           <Text className="text-dark-slate text-[16px] leading-[24px]">
-            <strong>Please note: This is not your final order confirmation.</strong> Our team is now verifying your payment details. Once your payment is confirmed, you will receive a separate email officially confirming your order and its details.
+           <Text className="text-dark-slate text-[16px] font-bold leading-[24px]">
+            Your tracking number is: <span className="font-mono text-coral">{trackingNumber}</span>
           </Text>
 
-          <Section className="bg-sand/50 border border-solid border-coral/20 rounded-lg p-5 my-5">
+          <Section className="bg-sand/50 border border-solid border-coral/20 rounded-lg p-5 my-5 text-center">
             <Heading as="h2" className="text-dark-slate text-[20px] font-semibold font-heading m-0 mb-4">
-              Your Submission Summary
+              Next Step: Payment
             </Heading>
-            <Text className="text-[14px] leading-[22px] m-0"><strong>Tracking Number:</strong> <span className="font-mono text-coral">{trackingNumber}</span></Text>
-            <Text className="text-[14px] leading-[22px] m-0"><strong>Copies:</strong> {copies}</Text>
-            <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Shipping Address:</strong><br/>{shippingAddress.split('\n').map((line, i) => <span key={i}>{line}<br/></span>)}</Text>
-             <Text className="text-[14px] leading-[22px] m-0 mt-2"><strong>Book Signing Event (Oct 28):</strong> {eventDetails}</Text>
+            <Text className="text-[14px] leading-[22px] m-0">
+              To finalize your order, please click the link below to make your payment and upload the receipt.
+            </Text>
+             <Link
+              className="bg-coral text-white font-semibold rounded-md text-[14px] py-3 px-5 no-underline text-center inline-block mt-4"
+              href={`${baseUrl}/order/${trackingNumber}`}
+              target="_blank"
+            >
+              Complete Your Order Now
+            </Link>
           </Section>
           
           <Text className="text-dark-slate text-[16px] leading-[24px]">
-            You can use your tracking number on our website to check the status of your submission. Please note that deliveries will commence after the official book launch on October 28th, 2025.
+            You can also visit the 'Track Your Order' page on our website at any time and enter your tracking number and email to check your status. Please note that deliveries will commence after the official book launch on October 28th, 2025.
           </Text>
           
           <Hr className="border border-solid border-coral/20 my-[26px] mx-0 w-full" />
@@ -83,4 +84,4 @@ export const CustomerConfirmationEmail = ({
   </Html>
 );
 
-export default CustomerConfirmationEmail;
+export default OrderConfirmedEmail;

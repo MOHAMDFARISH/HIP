@@ -70,7 +70,7 @@ export const OrderConfirmedEmail = ({
           </Section>
           
           <Text className="text-dark-slate text-[16px] leading-[24px]">
-            You can also visit the 'Track Your Order' page on our website at any time and enter your tracking number and email to check your status. Please note that deliveries will commence after the official book launch on November 4th, 2025.
+            You can also visit the 'Track Your Order' page on our website at any time and enter your tracking number and email to check your status. Please note that deliveries will commence after the official book launch on October 28th, 2025.
           </Text>
           
           <Hr className="border border-solid border-coral/20 my-[26px] mx-0 w-full" />

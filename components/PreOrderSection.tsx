@@ -195,7 +195,7 @@ const PreOrderSection: React.FC = () => {
                         <div className="text-center py-20">
                             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Submission Received!</h2>
                             <p className="mt-4 text-lg text-dark-slate/70 max-w-2xl mx-auto">
-                                Thank you! Your pre-order details have been saved.
+                                Thank you! Your order details have been saved.
                             </p>
                             <p className="mt-2 text-lg text-dark-slate/70 max-w-2xl mx-auto">
                                 An email is on its way with a link to finalize your payment.
@@ -221,7 +221,7 @@ const PreOrderSection: React.FC = () => {
                     ) : (
                     <>
                         <div className="text-center mb-12">
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Pre-Order 'Heal in Paradise'</h2>
+                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-dark-slate">Order 'Heal in Paradise'</h2>
                             <p className="mt-4 text-lg text-dark-slate/70 max-w-3xl mx-auto">
                                 Step 1: Fill in your details below. You'll receive an email with a link to complete payment after submission.
                             </p>
@@ -285,7 +285,7 @@ const PreOrderSection: React.FC = () => {
                                     <fieldset className="p-6 border-2 border-coral/40 rounded-lg bg-coral/10 space-y-4 shadow-md transition-all hover:shadow-lg">
                                         <div className="flex items-center gap-3">
                                             <CalendarIcon />
-                                            <legend className="font-heading text-xl font-bold text-dark-slate">Exclusive Book Signing <span className="text-coral">(NOV 04, 2025)</span></legend>
+                                            <legend className="font-heading text-xl font-bold text-dark-slate">Exclusive Book Signing <span className="text-coral">(OCT 28, 2025)</span></legend>
                                         </div>
                                         <p className="text-dark-slate/80 text-sm pl-9">Be part of the official launch! Register your interest now to receive an exclusive invitation.</p>
                                         <div className="mt-4 pl-9">

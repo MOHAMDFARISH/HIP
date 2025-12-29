@@ -62,18 +62,26 @@ const BlogListSection: React.FC<BlogListSectionProps> = ({ navigate }) => {
   };
 
   return (
-    <section className="py-20 bg-sand-50">
-      <div className="container mx-auto px-6 max-w-6xl">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="font-heading text-5xl md:text-6xl text-dark-slate mb-6">
-            Blog & Articles
-          </h1>
-          <p className="text-xl text-dark-slate/80 max-w-2xl mx-auto">
-            Explore insights on healing, poetry, and life in paradise. Featuring both original
-            content and curated articles from around the web.
-          </p>
-        </div>
+    <section className="py-16 md:py-24">
+      <div className="container mx-auto px-6">
+        <div
+          className="max-w-6xl mx-auto shadow-xl rounded-lg p-8 md:p-12 lg:p-16 ring-1 ring-black ring-opacity-5"
+          style={{
+            backgroundImage: "url('https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1920/v1758431623/Gemini_Generated_Image_ufm4haufm4haufm4_udkrj9.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h1 className="font-heading text-5xl md:text-6xl text-dark-slate mb-6">
+              Blog & Articles
+            </h1>
+            <p className="text-xl text-dark-slate/80 max-w-2xl mx-auto">
+              Explore insights on healing, poetry, and life in paradise. Featuring both original
+              content and curated articles from around the web.
+            </p>
+          </div>
 
         {/* Filter Tabs */}
         <div className="flex justify-center mb-12 gap-4">
@@ -206,6 +214,7 @@ const BlogListSection: React.FC<BlogListSectionProps> = ({ navigate }) => {
             </p>
           </div>
         )}
+        </div>
       </div>
     </section>
   );

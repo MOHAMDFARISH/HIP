@@ -10,6 +10,8 @@ import PreOrderPage from './pages/PreOrderPage';
 import TrackOrderPage from './pages/TrackOrderPage';
 import FAQPage from './pages/FAQPage';
 import ContactPage from './pages/ContactPage';
+import BlogPage from './pages/BlogPage';
+import BlogPostPage from './pages/BlogPostPage';
 
 const App: React.FC = () => {
   const [path, setPath] = useState(window.location.pathname);
@@ -33,9 +35,12 @@ const App: React.FC = () => {
         '/track-order': "Track Your 'Heal in Paradise' Order",
         '/faq': 'FAQ | Heal in Paradise',
         '/contact': 'Contact | Heal in Paradise',
+        '/blog': 'Blog & Articles | Heal in Paradise by Hawla Riza',
     };
     if (path.startsWith('/order/')) {
         document.title = 'Complete Your Payment | Heal in Paradise';
+    } else if (path.startsWith('/blog/')) {
+        document.title = 'Blog Post | Heal in Paradise';
     } else {
         document.title = titles[path] || 'Heal in Paradise | by Hawla Riza';
     }
@@ -55,6 +60,11 @@ const App: React.FC = () => {
       return trackingNumber ? <OrderPaymentPage trackingNumber={trackingNumber} /> : <HomePage navigate={navigate} />;
     }
 
+    if (path.startsWith('/blog/')) {
+      const slug = path.split('/')[2];
+      return slug ? <BlogPostPage slug={slug} navigate={navigate} /> : <BlogPage navigate={navigate} />;
+    }
+
     switch (path) {
       case '/':
         return <HomePage navigate={navigate} />;
@@ -72,6 +82,8 @@ const App: React.FC = () => {
         return <FAQPage />;
       case '/contact':
         return <ContactPage />;
+      case '/blog':
+        return <BlogPage navigate={navigate} />;
       default:
         // For any unknown path, render the home page as a 404 fallback.
         return <HomePage navigate={navigate} />;

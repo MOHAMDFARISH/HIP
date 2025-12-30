@@ -5,12 +5,19 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export interface ContentBlock {
+  type: 'text' | 'image' | 'list' | 'gallery' | 'quote' | 'heading' | 'divider';
+  [key: string]: any;
+}
+
 export interface BlogPost {
   id: string;
   title: string;
   slug: string;
   excerpt: string;
-  content?: string; // Optional for external links
+  content?: string; // Optional for external links or legacy posts
+  content_blocks?: ContentBlock[]; // New structured content format
+  post_type?: string; // 'article', 'list', 'guide', 'gallery', etc.
   featured_image: string;
   author: string;
   published_date: string;

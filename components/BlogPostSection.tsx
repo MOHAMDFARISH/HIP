@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase, BlogPost } from '../lib/supabaseClient';
 import ShareButtons from './ShareButtons';
+import ContentBlockRenderer from './ContentBlockRenderer';
 
 interface BlogPostSectionProps {
   slug: string;
@@ -245,16 +246,21 @@ const BlogPostSection: React.FC<BlogPostSectionProps> = ({ slug, navigate }) => 
           )}
 
           {/* Article Content */}
-          <div className="prose prose-lg max-w-none mb-12">
+          <div className="mb-12">
             <p className="text-xl text-dark-slate/80 font-body leading-relaxed mb-8">
               {post.excerpt}
             </p>
-            {post.content && (
+
+            {/* Render structured content blocks if available */}
+            {post.content_blocks && post.content_blocks.length > 0 ? (
+              <ContentBlockRenderer blocks={post.content_blocks} />
+            ) : post.content ? (
+              /* Fallback to legacy HTML content */
               <div
-                className="text-dark-slate/90 font-body leading-relaxed"
+                className="prose prose-lg max-w-none text-dark-slate/90 font-body leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
-            )}
+            ) : null}
           </div>
 
           {/* Tags */}

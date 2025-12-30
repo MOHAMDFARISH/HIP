@@ -65,7 +65,7 @@ const BlogListSection: React.FC<BlogListSectionProps> = ({ navigate }) => {
   };
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="pt-8 pb-16 md:pb-24">
       <div className="container mx-auto px-6">
         <div
           className="max-w-6xl mx-auto shadow-xl rounded-lg p-8 md:p-12 lg:p-16 ring-1 ring-black ring-opacity-5"

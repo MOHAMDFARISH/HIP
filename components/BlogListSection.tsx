@@ -10,6 +10,9 @@ const BlogListSection: React.FC<BlogListSectionProps> = ({ navigate }) => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'internal' | 'external'>('all');
 
+  // Default featured image
+  const DEFAULT_IMAGE = 'https://res.cloudinary.com/dmtolfhsv/image/upload/v1767116573/george-girnas-6RTn6HZD-RI-unsplash_mmmbm2.jpg';
+
   useEffect(() => {
     fetchPosts();
   }, [filter]);
@@ -137,7 +140,7 @@ const BlogListSection: React.FC<BlogListSectionProps> = ({ navigate }) => {
                 {/* Featured Image */}
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={post.featured_image}
+                    src={post.featured_image || DEFAULT_IMAGE}
                     alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
@@ -175,9 +178,9 @@ const BlogListSection: React.FC<BlogListSectionProps> = ({ navigate }) => {
                       {post.tags.slice(0, 3).map((tag, index) => (
                         <span
                           key={index}
-                          className="text-xs bg-sand-100 text-dark-slate px-3 py-1 rounded-full"
+                          className="text-xs font-medium bg-coral/10 text-coral border border-coral/20 px-3 py-1 rounded-full hover:bg-coral/20 transition-colors"
                         >
-                          {tag}
+                          #{tag}
                         </span>
                       ))}
                     </div>

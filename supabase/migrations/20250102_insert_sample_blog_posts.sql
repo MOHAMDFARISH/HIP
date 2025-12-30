@@ -29,7 +29,7 @@ INSERT INTO blog_posts (
 
 <h2>Your Own Journey</h2>
 <p>Everyone''s healing journey is unique. Whether you''re dealing with loss, searching for purpose, or simply seeking peace, poetry can be your companion. Let the words guide you toward your own paradise of healing.</p>',
-  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto/v1/blog/maldives-sunset',
+  NULL,  -- Will use default image
   'Hawla Riza',
   NOW(),
   FALSE,
@@ -75,7 +75,7 @@ INSERT INTO blog_posts (
 
 <h2>Poetry as Medicine</h2>
 <p>Poetry, in particular, offers a unique form of emotional expression. Its condensed nature forces us to distill our experiences into their essence, creating powerful moments of clarity and understanding.</p>',
-  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto/v1/blog/writing-therapy',
+  NULL,  -- Will use default image
   'Hawla Riza',
   NOW() - INTERVAL '7 days',
   FALSE,
@@ -106,7 +106,7 @@ INSERT INTO blog_posts (
   'The Maldives: A Paradise for Mindfulness and Meditation',
   'maldives-mindfulness-meditation',
   'An in-depth look at how the Maldives has become a premier destination for wellness retreats and mindfulness practices.',
-  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto/v1/blog/maldives-meditation',
+  NULL,  -- Will use default image
   'Various Authors',
   NOW() - INTERVAL '14 days',
   TRUE,
@@ -151,7 +151,7 @@ INSERT INTO blog_posts (
 
 <h2>A Message of Hope</h2>
 <p>My hope is that readers will find their own reflections in these poems. Whether you''re seeking healing, inspiration, or simply a moment of peace, I invite you to journey with me through these pages.</p>',
-  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto/v1/blog/writing-process',
+  NULL,  -- Will use default image
   'Hawla Riza',
   NOW() - INTERVAL '21 days',
   FALSE,
@@ -182,7 +182,7 @@ INSERT INTO blog_posts (
   'Poetry as a Tool for Mental Health: What Science Says',
   'poetry-mental-health-science',
   'Recent research reveals how reading and writing poetry can significantly impact mental health and emotional well-being.',
-  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto/v1/blog/science-poetry',
+  NULL,  -- Will use default image
   'Dr. Sarah Johnson',
   NOW() - INTERVAL '30 days',
   TRUE,
@@ -227,7 +227,7 @@ INSERT INTO blog_posts (
 
 <h2>Preserving Our Heritage</h2>
 <p>As the world becomes more connected, it''s crucial to preserve these traditions. Through poetry and storytelling, we keep our culture alive while adapting it to contemporary needs.</p>',
-  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto/v1/blog/maldivian-culture',
+  NULL,  -- Will use default image
   'Hawla Riza',
   NOW() - INTERVAL '45 days',
   FALSE,
@@ -258,7 +258,7 @@ INSERT INTO blog_posts (
   'Island Living and Mental Wellness: A Global Perspective',
   'island-living-mental-wellness',
   'How island communities around the world approach mental health and wellness, with insights from tropical paradises.',
-  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto/v1/blog/island-wellness',
+  NULL,  -- Will use default image
   'Global Wellness Institute',
   NOW() - INTERVAL '60 days',
   TRUE,

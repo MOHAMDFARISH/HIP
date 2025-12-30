@@ -18,7 +18,7 @@ export interface BlogPost {
   content?: string; // Optional for external links or legacy posts
   content_blocks?: ContentBlock[]; // New structured content format
   post_type?: string; // 'article', 'list', 'guide', 'gallery', etc.
-  featured_image: string;
+  featured_image?: string; // Optional - will use default image if not provided
   author: string;
   published_date: string;
   updated_date?: string;

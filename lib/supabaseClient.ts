@@ -33,3 +33,38 @@ export interface BlogPost {
   views_count: number;
   created_at: string;
 }
+
+export interface Review {
+  id: string;
+  reviewer_name: string;
+  reviewer_title?: string;
+  review_text: string;
+  rating?: number;
+  reviewer_photo?: string;
+  reviewer_location?: string;
+  is_featured: boolean;
+  is_published: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface MediaItem {
+  id: string;
+  title: string;
+  description?: string;
+  media_type: 'video' | 'interview' | 'article' | 'podcast';
+  source_type: 'youtube' | 'youtube-short' | 'tv' | 'website' | 'social';
+  embed_url?: string;
+  external_url?: string;
+  thumbnail_url?: string;
+  source_name?: string;
+  published_date?: string;
+  duration_minutes?: number;
+  is_featured: boolean;
+  is_published: boolean;
+  display_order: number;
+  views_count: number;
+  created_at: string;
+  updated_at?: string;
+}

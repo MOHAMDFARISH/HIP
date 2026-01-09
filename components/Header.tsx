@@ -42,6 +42,8 @@ const Header: React.FC<HeaderProps> = ({ currentPath, navigate }) => {
     { path: '/about-hawla-riza', label: 'Meet Hawla Riza' },
     { path: '/poetry-samples', label: 'Poetry Samples' },
     { path: '/blog', label: 'Blog' },
+    { path: '/reviews', label: 'Reviews' },
+    { path: '/media', label: 'Media' },
     { path: '/order-heal-in-paradise', label: 'Order Now' },
     { path: '/track-order', label: 'Track Order' },
     { path: '/faq', label: 'FAQ' },

@@ -12,6 +12,8 @@ import FAQPage from './pages/FAQPage';
 import ContactPage from './pages/ContactPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
+import ReviewsPage from './pages/ReviewsPage';
+import MediaPage from './pages/MediaPage';
 
 const App: React.FC = () => {
   const [path, setPath] = useState(window.location.pathname);
@@ -36,6 +38,8 @@ const App: React.FC = () => {
         '/faq': 'FAQ | Heal in Paradise',
         '/contact': 'Contact | Heal in Paradise',
         '/blog': 'Blog & Articles | Heal in Paradise by Hawla Riza',
+        '/reviews': 'Reader Reviews | Heal in Paradise by Hawla Riza',
+        '/media': 'Press & Media | Heal in Paradise by Hawla Riza',
     };
     if (path.startsWith('/order/')) {
         document.title = 'Complete Your Payment | Heal in Paradise';
@@ -84,6 +88,10 @@ const App: React.FC = () => {
         return <ContactPage />;
       case '/blog':
         return <BlogPage navigate={navigate} />;
+      case '/reviews':
+        return <ReviewsPage />;
+      case '/media':
+        return <MediaPage />;
       default:
         // For any unknown path, render the home page as a 404 fallback.
         return <HomePage navigate={navigate} />;

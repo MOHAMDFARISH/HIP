@@ -182,7 +182,7 @@ const BlogPostSection: React.FC<BlogPostSectionProps> = ({ slug, navigate }) => 
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleStructuredData) }}
       />
 
-      <article className="py-12 bg-white">
+      <article className="bg-white">
         {/* Hero Section with Featured Image */}
         <div className="relative h-96 mb-12">
           <img

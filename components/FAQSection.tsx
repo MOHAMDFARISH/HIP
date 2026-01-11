@@ -14,8 +14,8 @@ const faqData = [
         answer: "Unlike typical souvenirs, 'Heal in Paradise' is a cultural and artistic keepsake. It's a beautifully crafted hardcover book with exquisite watercolor illustrations, designed to be a timeless piece of Maldivian literature that you can cherish and display."
     },
     {
-        question: "When will the book be released?",
-        answer: "The official release and book signing event is scheduled for November 4, 2025. Orders will be shipped shortly after this date."
+        question: "Is the book available now?",
+        answer: "Yes! The book was officially released on November 4, 2025, with a special book signing event. You can order your copy now and it will be shipped to you promptly."
     },
     {
         question: "How can I order Heal in Paradise?",
@@ -31,7 +31,7 @@ const faqData = [
     },
     {
         question: "Where can I get Heal in Paradise in the Maldives?",
-        answer: "After the official launch on November 4, 2025, the book will be available at select local bookstores and gift shops in the Maldives. The best way to guarantee a copy is to order through this website."
+        answer: "The book is now available at select local bookstores and gift shops in the Maldives following the November 4, 2025 launch. The best way to guarantee a copy is to order through this website."
     }
 ];
 

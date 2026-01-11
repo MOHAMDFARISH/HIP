@@ -63,6 +63,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hawlariza.com/reviews</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hawlariza.com/media</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hawlariza.com/poetry-samples</loc>
     <lastmod>2025-10-12</lastmod>
     <changefreq>monthly</changefreq>

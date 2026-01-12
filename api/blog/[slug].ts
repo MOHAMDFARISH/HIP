@@ -1,47 +1,56 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+// Use Edge Runtime for better network performance
+export const config = {
+  runtime: 'edge',
+};
 
 const DEFAULT_IMAGE = 'https://res.cloudinary.com/dmtolfhsv/image/upload/v1767116573/george-girnas-6RTn6HZD-RI-unsplash_mmmbm2.jpg';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { slug } = req.query;
+export default async function handler(req: Request) {
+  const url = new URL(req.url);
+  const slug = url.pathname.split('/').pop();
 
-  // Add debug header to verify function is running
-  res.setHeader('X-Blog-Handler', 'active');
-
-  if (typeof slug !== 'string') {
-    return res.status(400).send('Invalid slug');
+  if (!slug) {
+    return new Response('Invalid slug', { status: 400 });
   }
 
   // Check if this is a social media crawler or regular browser
-  const userAgent = req.headers['user-agent'] || '';
+  const userAgent = req.headers.get('user-agent') || '';
   const isSocialCrawler = /bot|crawler|spider|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegram|slackbot|pinterest/i.test(userAgent);
 
-  // Add header to indicate if crawler was detected
-  res.setHeader('X-Is-Crawler', isSocialCrawler ? 'yes' : 'no');
+  const headers = new Headers({
+    'X-Blog-Handler': 'active',
+    'X-Is-Crawler': isSocialCrawler ? 'yes' : 'no',
+  });
 
   // If not a social media crawler, let the SPA handle it
   if (!isSocialCrawler) {
     // For regular browsers, just return the normal index.html
     // and let React handle the routing
     try {
-      const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
+      const baseUrl = `https://${req.headers.get('host') || 'hawlariza.com'}`;
       const response = await fetch(`${baseUrl}/index.html`);
       const html = await response.text();
 
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(html);
+      return new Response(html, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'X-Blog-Handler': 'active',
+          'X-Is-Crawler': 'no',
+        },
+      });
     } catch (e) {
-      return res.redirect(307, '/');
+      return Response.redirect('https://hawlariza.com/', 307);
     }
   }
 
   try {
-    // Fetch blog post data using direct REST API call instead of Supabase client
-    // This is more reliable in serverless environments
+    // Fetch blog post data using direct REST API call
     const supabaseUrl = 'https://qgcgzoysvxpnjegijmmu.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnY2d6b3lzdnhwbmplZ2lqbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjI0MDksImV4cCI6MjA3MzU5ODQwOX0.xqfhDOi15RQk_LZ8_FEEpyuYZFbFGVLYU7pYjoxLtEY';
 
     let post = null;
+    let supabaseError = null;
 
     try {
       const response = await fetch(
@@ -56,52 +65,49 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       );
 
       if (!response.ok) {
-        res.setHeader('X-Supabase-Error', `Status ${response.status}`);
+        supabaseError = `Status ${response.status}`;
         console.error('Supabase returned error:', response.status);
       } else {
         const posts = await response.json();
         post = posts && posts.length > 0 ? posts[0] : null;
       }
     } catch (fetchError) {
-      // If Supabase fetch fails, log it but continue
-      res.setHeader('X-Supabase-Error', String(fetchError));
+      supabaseError = String(fetchError);
       console.error('Failed to fetch from Supabase:', fetchError);
     }
 
     if (!post) {
       console.error('Blog post not found for slug:', slug);
 
-      // Add header to indicate post was not found
-      res.setHeader('X-Post-Found', 'no');
-      res.setHeader('X-Error', `Post not found for slug: ${slug}`);
-
-      // For crawlers, return index.html with default tags instead of redirecting
-      // This prevents Facebook from seeing a 307 redirect
-      const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
+      // For crawlers, return index.html with default tags
+      const baseUrl = `https://${req.headers.get('host') || 'hawlariza.com'}`;
       const htmlResponse = await fetch(`${baseUrl}/index.html`);
       const html = await htmlResponse.text();
 
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(html);
+      headers.set('Content-Type', 'text/html; charset=utf-8');
+      headers.set('X-Post-Found', 'no');
+      headers.set('X-Error', `Post not found for slug: ${slug}`);
+      if (supabaseError) {
+        headers.set('X-Supabase-Error', supabaseError);
+      }
+
+      return new Response(html, { status: 200, headers });
     }
 
-    // Add header to indicate post was found
-    res.setHeader('X-Post-Found', 'yes');
-    res.setHeader('X-Post-Title', post.title.substring(0, 100));
+    // Add headers to indicate post was found
+    headers.set('X-Post-Found', 'yes');
+    headers.set('X-Post-Title', post.title.substring(0, 100));
 
     const postUrl = `https://hawlariza.com/blog/${post.slug}`;
     const shareImage = post.featured_image || DEFAULT_IMAGE;
 
     // Fetch the base index.html file
-    let html: string;
-
-    // Fetch index.html - always use fetch for reliability in Vercel
-    const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
-    res.setHeader('X-Html-Source', `fetch:${baseUrl}/index.html`);
+    const baseUrl = `https://${req.headers.get('host') || 'hawlariza.com'}`;
+    headers.set('X-Html-Source', `fetch:${baseUrl}/index.html`);
 
     const htmlResponse = await fetch(`${baseUrl}/index.html`, {
       headers: {
-        'User-Agent': 'Vercel-Serverless-Function',
+        'User-Agent': 'Vercel-Edge-Function',
       },
     });
 
@@ -109,7 +115,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error(`Failed to fetch index.html: ${htmlResponse.status}`);
     }
 
-    html = await htmlResponse.text();
+    let html = await htmlResponse.text();
 
     // Escape HTML entities in content
     const escapeHtml = (text: string) => {
@@ -188,11 +194,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       );
 
     // Return the modified HTML
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-    res.status(200).send(html);
+    headers.set('Content-Type', 'text/html; charset=utf-8');
+    headers.set('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+
+    return new Response(html, { status: 200, headers });
   } catch (error) {
     console.error('Error in blog post handler:', error);
-    res.status(500).send('Internal Server Error');
+    return new Response('Internal Server Error', {
+      status: 500,
+      headers: {
+        'Content-Type': 'text/plain',
+        'X-Blog-Handler': 'active',
+        'X-Error': String(error),
+      },
+    });
   }
 }

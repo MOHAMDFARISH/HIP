@@ -1,46 +1,33 @@
-// Use Edge Runtime for better network performance
-export const config = {
-  runtime: 'edge',
-};
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const DEFAULT_IMAGE = 'https://res.cloudinary.com/dmtolfhsv/image/upload/v1767116573/george-girnas-6RTn6HZD-RI-unsplash_mmmbm2.jpg';
 
-export default async function handler(req: Request) {
-  const url = new URL(req.url);
-  const slug = url.pathname.split('/').pop();
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const { slug } = req.query;
 
-  if (!slug) {
-    return new Response('Invalid slug', { status: 400 });
+  res.setHeader('X-Blog-Handler', 'active');
+
+  if (typeof slug !== 'string') {
+    return res.status(400).send('Invalid slug');
   }
 
   // Check if this is a social media crawler or regular browser
-  const userAgent = req.headers.get('user-agent') || '';
+  const userAgent = req.headers['user-agent'] || '';
   const isSocialCrawler = /bot|crawler|spider|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegram|slackbot|pinterest/i.test(userAgent);
 
-  const headers = new Headers({
-    'X-Blog-Handler': 'active',
-    'X-Is-Crawler': isSocialCrawler ? 'yes' : 'no',
-  });
+  res.setHeader('X-Is-Crawler', isSocialCrawler ? 'yes' : 'no');
 
   // If not a social media crawler, let the SPA handle it
   if (!isSocialCrawler) {
-    // For regular browsers, just return the normal index.html
-    // and let React handle the routing
     try {
-      const baseUrl = `https://${req.headers.get('host') || 'hawlariza.com'}`;
+      const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
       const response = await fetch(`${baseUrl}/index.html`);
       const html = await response.text();
 
-      return new Response(html, {
-        status: 200,
-        headers: {
-          'Content-Type': 'text/html; charset=utf-8',
-          'X-Blog-Handler': 'active',
-          'X-Is-Crawler': 'no',
-        },
-      });
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(html);
     } catch (e) {
-      return Response.redirect('https://hawlariza.com/', 307);
+      return res.redirect(307, '/');
     }
   }
 
@@ -100,36 +87,36 @@ export default async function handler(req: Request) {
       console.error('Blog post not found for slug:', slug);
 
       // For crawlers, return index.html with default tags
-      const baseUrl = `https://${req.headers.get('host') || 'hawlariza.com'}`;
+      const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
       const htmlResponse = await fetch(`${baseUrl}/index.html`);
       const html = await htmlResponse.text();
 
-      headers.set('Content-Type', 'text/html; charset=utf-8');
-      headers.set('X-Post-Found', 'no');
-      headers.set('X-Error', `Post not found for slug: ${slug}`);
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('X-Post-Found', 'no');
+      res.setHeader('X-Error', `Post not found for slug: ${slug}`);
       if (supabaseError) {
         // Sanitize header value: remove newlines and control characters
         const sanitizedError = supabaseError.replace(/[\r\n\t]/g, ' ').replace(/[^\x20-\x7E]/g, '');
-        headers.set('X-Supabase-Error', sanitizedError);
+        res.setHeader('X-Supabase-Error', sanitizedError);
       }
 
-      return new Response(html, { status: 200, headers });
+      return res.status(200).send(html);
     }
 
     // Add headers to indicate post was found
-    headers.set('X-Post-Found', 'yes');
-    headers.set('X-Post-Title', post.title.substring(0, 100));
+    res.setHeader('X-Post-Found', 'yes');
+    res.setHeader('X-Post-Title', post.title.substring(0, 100));
 
     const postUrl = `https://hawlariza.com/blog/${post.slug}`;
     const shareImage = post.featured_image || DEFAULT_IMAGE;
 
     // Fetch the base index.html file
-    const baseUrl = `https://${req.headers.get('host') || 'hawlariza.com'}`;
-    headers.set('X-Html-Source', `fetch:${baseUrl}/index.html`);
+    const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
+    res.setHeader('X-Html-Source', `fetch:${baseUrl}/index.html`);
 
     const htmlResponse = await fetch(`${baseUrl}/index.html`, {
       headers: {
-        'User-Agent': 'Vercel-Edge-Function',
+        'User-Agent': 'Vercel-Serverless-Function',
       },
     });
 
@@ -216,19 +203,11 @@ export default async function handler(req: Request) {
       );
 
     // Return the modified HTML
-    headers.set('Content-Type', 'text/html; charset=utf-8');
-    headers.set('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-
-    return new Response(html, { status: 200, headers });
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+    res.status(200).send(html);
   } catch (error) {
     console.error('Error in blog post handler:', error);
-    return new Response('Internal Server Error', {
-      status: 500,
-      headers: {
-        'Content-Type': 'text/plain',
-        'X-Blog-Handler': 'active',
-        'X-Error': String(error),
-      },
-    });
+    res.status(500).send('Internal Server Error');
   }
 }

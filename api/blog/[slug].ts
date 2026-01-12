@@ -85,7 +85,9 @@ export default async function handler(req: Request) {
         }
       }
     } catch (fetchError: any) {
-      supabaseError = `Exception: ${fetchError?.message || String(fetchError)} | Stack: ${fetchError?.stack?.substring(0, 100)}`;
+      const errorMsg = fetchError?.message || String(fetchError);
+      const stackTrace = fetchError?.stack?.substring(0, 100) || '';
+      supabaseError = `Exception: ${errorMsg} | Stack: ${stackTrace}`;
       console.error('Failed to fetch from Supabase:', {
         error: fetchError,
         message: fetchError?.message,
@@ -106,7 +108,9 @@ export default async function handler(req: Request) {
       headers.set('X-Post-Found', 'no');
       headers.set('X-Error', `Post not found for slug: ${slug}`);
       if (supabaseError) {
-        headers.set('X-Supabase-Error', supabaseError);
+        // Sanitize header value: remove newlines and control characters
+        const sanitizedError = supabaseError.replace(/[\r\n\t]/g, ' ').replace(/[^\x20-\x7E]/g, '');
+        headers.set('X-Supabase-Error', sanitizedError);
       }
 
       return new Response(html, { status: 200, headers });

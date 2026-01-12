@@ -65,14 +65,26 @@ export default async function handler(req: Request) {
       );
 
       if (!response.ok) {
-        supabaseError = `Status ${response.status}`;
-        console.error('Supabase returned error:', response.status);
+        // Get the error details from Supabase
+        const errorText = await response.text();
+        supabaseError = `Status ${response.status}: ${errorText}`;
+        console.error('Supabase returned error:', response.status, errorText);
       } else {
         const posts = await response.json();
         post = posts && posts.length > 0 ? posts[0] : null;
+
+        // Add debug info about what was returned
+        if (!post) {
+          supabaseError = `Query returned ${posts?.length || 0} posts`;
+          console.log('Supabase query succeeded but no posts found:', {
+            slug,
+            resultsCount: posts?.length,
+            results: posts
+          });
+        }
       }
     } catch (fetchError) {
-      supabaseError = String(fetchError);
+      supabaseError = `Fetch exception: ${String(fetchError)}`;
       console.error('Failed to fetch from Supabase:', fetchError);
     }
 

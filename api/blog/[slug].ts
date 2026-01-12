@@ -41,23 +41,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const supabaseUrl = 'https://qgcgzoysvxpnjegijmmu.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnY2d6b3lzdnhwbmplZ2lqbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjI0MDksImV4cCI6MjA3MzU5ODQwOX0.xqfhDOi15RQk_LZ8_FEEpyuYZFbFGVLYU7pYjoxLtEY';
 
-    const response = await fetch(
-      `${supabaseUrl}/rest/v1/blog_posts?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=*`,
-      {
-        headers: {
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    let post = null;
 
-    const posts = await response.json();
-    const post = posts && posts.length > 0 ? posts[0] : null;
+    try {
+      const response = await fetch(
+        `${supabaseUrl}/rest/v1/blog_posts?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=*`,
+        {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        res.setHeader('X-Supabase-Error', `Status ${response.status}`);
+        console.error('Supabase returned error:', response.status);
+      } else {
+        const posts = await response.json();
+        post = posts && posts.length > 0 ? posts[0] : null;
+      }
+    } catch (fetchError) {
+      // If Supabase fetch fails, log it but continue
+      res.setHeader('X-Supabase-Error', String(fetchError));
+      console.error('Failed to fetch from Supabase:', fetchError);
+    }
 
     if (!post) {
       console.error('Blog post not found for slug:', slug);
-      console.error('Response status:', response.status);
 
       // Add header to indicate post was not found
       res.setHeader('X-Post-Found', 'no');

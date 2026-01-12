@@ -1,12 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
 import * as fs from 'fs';
 import * as path from 'path';
-
-const supabase = createClient(
-  'https://qgcgzoysvxpnjegijmmu.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnY2d6b3lzdnhwbmplZ2lqbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjI0MDksImV4cCI6MjA3MzU5ODQwOX0.xqfhDOi15RQk_LZ8_FEEpyuYZFbFGVLYU7pYjoxLtEY'
-);
 
 const DEFAULT_IMAGE = 'https://res.cloudinary.com/dmtolfhsv/image/upload/v1767116573/george-girnas-6RTn6HZD-RI-unsplash_mmmbm2.jpg';
 
@@ -44,21 +38,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Fetch blog post data
-    const { data: post, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('slug', slug)
-      .eq('is_published', true)
-      .single();
+    // Fetch blog post data using direct REST API call instead of Supabase client
+    // This is more reliable in serverless environments
+    const supabaseUrl = 'https://qgcgzoysvxpnjegijmmu.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnY2d6b3lzdnhwbmplZ2lqbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjI0MDksImV4cCI6MjA3MzU5ODQwOX0.xqfhDOi15RQk_LZ8_FEEpyuYZFbFGVLYU7pYjoxLtEY';
 
-    if (error || !post) {
-      console.error('Error fetching blog post:', error);
-      console.error('Slug requested:', slug);
+    const response = await fetch(
+      `${supabaseUrl}/rest/v1/blog_posts?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=*`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const posts = await response.json();
+    const post = posts && posts.length > 0 ? posts[0] : null;
+
+    if (!post) {
+      console.error('Blog post not found for slug:', slug);
+      console.error('Response status:', response.status);
 
       // Add header to indicate post was not found
       res.setHeader('X-Post-Found', 'no');
-      res.setHeader('X-Error', error?.message || 'Post not found');
+      res.setHeader('X-Error', `Post not found for slug: ${slug}`);
 
       // For crawlers, return index.html with default tags instead of redirecting
       // This prevents Facebook from seeing a 307 redirect
@@ -80,22 +85,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Fetch the base index.html file
     let html: string;
 
-    // Try to read from the deployed static files first
     try {
-      // Check if we're in production and can access the dist folder
-      if (fs.existsSync(path.join(process.cwd(), 'index.html'))) {
-        html = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf-8');
-      } else {
-        // Fallback: make an internal request to get the index.html
-        const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
-        const response = await fetch(`${baseUrl}/index.html`);
+      // Try multiple paths where index.html might be located in Vercel
+      const possiblePaths = [
+        path.join(process.cwd(), 'index.html'),
+        path.join(process.cwd(), 'dist', 'index.html'),
+        path.join(process.cwd(), '.vercel', 'output', 'static', 'index.html'),
+        path.join(process.cwd(), 'public', 'index.html'),
+      ];
+
+      let htmlFound = false;
+      for (const htmlPath of possiblePaths) {
+        if (fs.existsSync(htmlPath)) {
+          html = fs.readFileSync(htmlPath, 'utf-8');
+          htmlFound = true;
+          res.setHeader('X-Html-Source', `file:${htmlPath}`);
+          break;
+        }
+      }
+
+      if (!htmlFound) {
+        // If file not found, fetch from the deployed site
+        // Use the origin header to avoid circular requests
+        const origin = req.headers.origin || 'https://hawlariza.com';
+        const fetchUrl = `${origin}/index.html`;
+        res.setHeader('X-Html-Source', `fetch:${fetchUrl}`);
+
+        const response = await fetch(fetchUrl, {
+          headers: {
+            'User-Agent': 'Vercel-Serverless-Function',
+          },
+        });
         html = await response.text();
       }
     } catch (e) {
       console.error('Error reading index.html:', e);
-      // Last resort: fetch from the main domain
-      const response = await fetch('https://hawlariza.com/index.html');
-      html = await response.text();
+      res.setHeader('X-Html-Error', String(e));
+
+      // Last resort: return a minimal HTML with just the meta tags
+      throw e;
     }
 
     // Escape HTML entities in content

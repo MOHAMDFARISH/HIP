@@ -13,6 +13,9 @@ const DEFAULT_IMAGE = 'https://res.cloudinary.com/dmtolfhsv/image/upload/v176711
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { slug } = req.query;
 
+  // Add debug header to verify function is running
+  res.setHeader('X-Blog-Handler', 'active');
+
   if (typeof slug !== 'string') {
     return res.status(400).send('Invalid slug');
   }
@@ -20,6 +23,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Check if this is a social media crawler or regular browser
   const userAgent = req.headers['user-agent'] || '';
   const isSocialCrawler = /bot|crawler|spider|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegram|slackbot|pinterest/i.test(userAgent);
+
+  // Add header to indicate if crawler was detected
+  res.setHeader('X-Is-Crawler', isSocialCrawler ? 'yes' : 'no');
 
   // If not a social media crawler, let the SPA handle it
   if (!isSocialCrawler) {
@@ -48,10 +54,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (error || !post) {
       console.error('Error fetching blog post:', error);
-      // Return default index.html if post not found
-      return res.redirect(307, '/');
+      console.error('Slug requested:', slug);
+
+      // Add header to indicate post was not found
+      res.setHeader('X-Post-Found', 'no');
+      res.setHeader('X-Error', error?.message || 'Post not found');
+
+      // For crawlers, return index.html with default tags instead of redirecting
+      // This prevents Facebook from seeing a 307 redirect
+      const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
+      const response = await fetch(`${baseUrl}/index.html`);
+      const html = await response.text();
+
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(html);
     }
 
+    // Add header to indicate post was found
+    res.setHeader('X-Post-Found', 'yes');
+    res.setHeader('X-Post-Title', post.title.substring(0, 100));
 
     const postUrl = `https://hawlariza.com/blog/${post.slug}`;
     const shareImage = post.featured_image || DEFAULT_IMAGE;

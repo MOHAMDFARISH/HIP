@@ -260,7 +260,7 @@ const BlogPostSection: React.FC<BlogPostSectionProps> = ({ slug, navigate }) => 
             ) : post.content ? (
               /* Fallback to legacy HTML content */
               <div
-                className="prose prose-lg max-w-none text-dark-slate/90 font-body leading-relaxed"
+                className="blog-content"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
             ) : null}

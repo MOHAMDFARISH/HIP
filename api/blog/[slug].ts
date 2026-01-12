@@ -17,6 +17,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).send('Invalid slug');
   }
 
+  // Check if this is a social media crawler or regular browser
+  const userAgent = req.headers['user-agent'] || '';
+  const isSocialCrawler = /bot|crawler|spider|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegram|slackbot|pinterest/i.test(userAgent);
+
+  // If not a social media crawler, let the SPA handle it
+  if (!isSocialCrawler) {
+    // For regular browsers, just return the normal index.html
+    // and let React handle the routing
+    try {
+      const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
+      const response = await fetch(`${baseUrl}/index.html`);
+      const html = await response.text();
+
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(html);
+    } catch (e) {
+      return res.redirect(307, '/');
+    }
+  }
+
   try {
     // Fetch blog post data
     const { data: post, error } = await supabase
@@ -31,6 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Return default index.html if post not found
       return res.redirect(307, '/');
     }
+
 
     const postUrl = `https://hawlariza.com/blog/${post.slug}`;
     const shareImage = post.featured_image || DEFAULT_IMAGE;

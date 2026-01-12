@@ -53,29 +53,30 @@ export default async function handler(req: Request) {
     let supabaseError = null;
 
     try {
-      const response = await fetch(
-        `${supabaseUrl}/rest/v1/blog_posts?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=*`,
-        {
-          headers: {
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const fetchUrl = `${supabaseUrl}/rest/v1/blog_posts?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=*`;
+
+      const response = await fetch(fetchUrl, {
+        method: 'GET',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Accept': 'application/json',
+          'Accept-Profile': 'public',
+        },
+      });
 
       if (!response.ok) {
         // Get the error details from Supabase
         const errorText = await response.text();
-        supabaseError = `Status ${response.status}: ${errorText}`;
-        console.error('Supabase returned error:', response.status, errorText);
+        supabaseError = `HTTP ${response.status}: ${errorText}`;
+        console.error('Supabase HTTP error:', response.status, errorText);
       } else {
         const posts = await response.json();
         post = posts && posts.length > 0 ? posts[0] : null;
 
         // Add debug info about what was returned
         if (!post) {
-          supabaseError = `Query returned ${posts?.length || 0} posts`;
+          supabaseError = `Query OK but ${posts?.length || 0} results`;
           console.log('Supabase query succeeded but no posts found:', {
             slug,
             resultsCount: posts?.length,
@@ -83,9 +84,14 @@ export default async function handler(req: Request) {
           });
         }
       }
-    } catch (fetchError) {
-      supabaseError = `Fetch exception: ${String(fetchError)}`;
-      console.error('Failed to fetch from Supabase:', fetchError);
+    } catch (fetchError: any) {
+      supabaseError = `Exception: ${fetchError?.message || String(fetchError)} | Stack: ${fetchError?.stack?.substring(0, 100)}`;
+      console.error('Failed to fetch from Supabase:', {
+        error: fetchError,
+        message: fetchError?.message,
+        stack: fetchError?.stack,
+        url: `${supabaseUrl}/rest/v1/blog_posts`
+      });
     }
 
     if (!post) {

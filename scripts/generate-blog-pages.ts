@@ -33,10 +33,19 @@ async function generateBlogPages() {
   const templatePath = path.join(process.cwd(), 'index.html');
   const template = fs.readFileSync(templatePath, 'utf-8');
 
-  // Create blog directory if it doesn't exist
-  const blogDir = path.join(process.cwd(), 'public', 'blog');
+  // Create public/blog directory - Vite will copy to dist
+  const publicDir = path.join(process.cwd(), 'public');
+  const blogDir = path.join(publicDir, 'blog');
+
+  // Create public directory if it doesn't exist
+  if (!fs.existsSync(publicDir)) {
+    fs.mkdirSync(publicDir, { recursive: true });
+    console.log('Created public directory');
+  }
+
   if (!fs.existsSync(blogDir)) {
     fs.mkdirSync(blogDir, { recursive: true });
+    console.log('Created public/blog directory');
   }
 
   // Generate HTML for each post
@@ -131,4 +140,9 @@ async function generateBlogPages() {
   console.log(`\n✅ Successfully generated ${posts.length} blog pages!`);
 }
 
-generateBlogPages().catch(console.error);
+generateBlogPages().catch((error) => {
+  console.error('❌ Failed to generate blog pages:', error);
+  console.error('Build will continue, but blog pages will not have custom meta tags');
+  // Don't exit with error code - allow build to continue
+  process.exit(0);
+});

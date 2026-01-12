@@ -1,6 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
 
 const DEFAULT_IMAGE = 'https://res.cloudinary.com/dmtolfhsv/image/upload/v1767116573/george-girnas-6RTn6HZD-RI-unsplash_mmmbm2.jpg';
+
+// Initialize Supabase client
+const supabase = createClient(
+  'https://qgcgzoysvxpnjegijmmu.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnY2d6b3lzdnhwbmplZ2lqbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjI0MDksImV4cCI6MjA3MzU5ODQwOX0.xqfhDOi15RQk_LZ8_FEEpyuYZFbFGVLYU7pYjoxLtEY'
+);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { slug } = req.query;
@@ -32,54 +39,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Fetch blog post data using direct REST API call
-    const supabaseUrl = 'https://qgcgzoysvxpnjegijmmu.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnY2d6b3lzdnhwbmplZ2lqbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjI0MDksImV4cCI6MjA3MzU5ODQwOX0.xqfhDOi15RQk_LZ8_FEEpyuYZFbFGVLYU7pYjoxLtEY';
-
+    // Fetch blog post data using Supabase SDK
     let post = null;
     let supabaseError = null;
 
     try {
-      const fetchUrl = `${supabaseUrl}/rest/v1/blog_posts?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=*`;
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('is_published', true)
+        .single();
 
-      const response = await fetch(fetchUrl, {
-        method: 'GET',
-        headers: {
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
-          'Accept': 'application/json',
-          'Accept-Profile': 'public',
-        },
-      });
-
-      if (!response.ok) {
-        // Get the error details from Supabase
-        const errorText = await response.text();
-        supabaseError = `HTTP ${response.status}: ${errorText}`;
-        console.error('Supabase HTTP error:', response.status, errorText);
+      if (error) {
+        supabaseError = `Supabase error: ${error.message} (${error.code})`;
+        console.error('Supabase query error:', error);
+      } else if (data) {
+        post = data;
+        res.setHeader('X-Post-Found', 'yes');
+        res.setHeader('X-Post-Title', post.title.substring(0, 100));
       } else {
-        const posts = await response.json();
-        post = posts && posts.length > 0 ? posts[0] : null;
-
-        // Add debug info about what was returned
-        if (!post) {
-          supabaseError = `Query OK but ${posts?.length || 0} results`;
-          console.log('Supabase query succeeded but no posts found:', {
-            slug,
-            resultsCount: posts?.length,
-            results: posts
-          });
-        }
+        supabaseError = 'No data returned';
+        console.log('Supabase query succeeded but no data:', { slug });
       }
     } catch (fetchError: any) {
       const errorMsg = fetchError?.message || String(fetchError);
       const stackTrace = fetchError?.stack?.substring(0, 100) || '';
       supabaseError = `Exception: ${errorMsg} | Stack: ${stackTrace}`;
-      console.error('Failed to fetch from Supabase:', {
+      console.error('Failed to query Supabase:', {
         error: fetchError,
         message: fetchError?.message,
         stack: fetchError?.stack,
-        url: `${supabaseUrl}/rest/v1/blog_posts`
       });
     }
 
@@ -103,10 +93,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).send(html);
     }
 
-    // Add headers to indicate post was found
-    res.setHeader('X-Post-Found', 'yes');
-    res.setHeader('X-Post-Title', post.title.substring(0, 100));
-
+    // Post was found - prepare meta tags
     const postUrl = `https://hawlariza.com/blog/${post.slug}`;
     const shareImage = post.featured_image || DEFAULT_IMAGE;
 

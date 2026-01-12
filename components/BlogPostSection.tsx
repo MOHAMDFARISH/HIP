@@ -36,8 +36,11 @@ const BlogPostSection: React.FC<BlogPostSectionProps> = ({ slug, navigate }) => 
       } else if (data) {
         setPost(data);
 
-        // Update document metadata for SEO
+        // Update document metadata for SEO and social sharing
         if (typeof document !== 'undefined') {
+          const postUrl = `https://hawlariza.com/blog/${data.slug}`;
+          const shareImage = data.featured_image || DEFAULT_IMAGE;
+
           document.title = `${data.title} | Heal in Paradise Blog`;
 
           // Update meta description
@@ -46,7 +49,17 @@ const BlogPostSection: React.FC<BlogPostSectionProps> = ({ slug, navigate }) => 
             metaDescription.setAttribute('content', data.meta_description);
           }
 
-          // Update Open Graph tags
+          // Update Open Graph tags for Facebook, LinkedIn, etc.
+          let ogType = document.querySelector('meta[property="og:type"]');
+          if (ogType) {
+            ogType.setAttribute('content', 'article');
+          }
+
+          let ogUrl = document.querySelector('meta[property="og:url"]');
+          if (ogUrl) {
+            ogUrl.setAttribute('content', postUrl);
+          }
+
           let ogTitle = document.querySelector('meta[property="og:title"]');
           if (ogTitle) {
             ogTitle.setAttribute('content', data.title);
@@ -59,7 +72,28 @@ const BlogPostSection: React.FC<BlogPostSectionProps> = ({ slug, navigate }) => 
 
           let ogImage = document.querySelector('meta[property="og:image"]');
           if (ogImage) {
-            ogImage.setAttribute('content', data.featured_image);
+            ogImage.setAttribute('content', shareImage);
+          }
+
+          // Update Twitter Card tags
+          let twitterUrl = document.querySelector('meta[property="twitter:url"]');
+          if (twitterUrl) {
+            twitterUrl.setAttribute('content', postUrl);
+          }
+
+          let twitterTitle = document.querySelector('meta[name="twitter:title"]');
+          if (twitterTitle) {
+            twitterTitle.setAttribute('content', data.title);
+          }
+
+          let twitterDescription = document.querySelector('meta[name="twitter:description"]');
+          if (twitterDescription) {
+            twitterDescription.setAttribute('content', data.meta_description);
+          }
+
+          let twitterImage = document.querySelector('meta[name="twitter:image"]');
+          if (twitterImage) {
+            twitterImage.setAttribute('content', shareImage);
           }
         }
 

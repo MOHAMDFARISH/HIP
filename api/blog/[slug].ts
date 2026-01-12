@@ -1,6 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import * as fs from 'fs';
-import * as path from 'path';
 
 const DEFAULT_IMAGE = 'https://res.cloudinary.com/dmtolfhsv/image/upload/v1767116573/george-girnas-6RTn6HZD-RI-unsplash_mmmbm2.jpg';
 
@@ -68,8 +66,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // For crawlers, return index.html with default tags instead of redirecting
       // This prevents Facebook from seeing a 307 redirect
       const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
-      const response = await fetch(`${baseUrl}/index.html`);
-      const html = await response.text();
+      const htmlResponse = await fetch(`${baseUrl}/index.html`);
+      const html = await htmlResponse.text();
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.status(200).send(html);
@@ -85,46 +83,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Fetch the base index.html file
     let html: string;
 
-    try {
-      // Try multiple paths where index.html might be located in Vercel
-      const possiblePaths = [
-        path.join(process.cwd(), 'index.html'),
-        path.join(process.cwd(), 'dist', 'index.html'),
-        path.join(process.cwd(), '.vercel', 'output', 'static', 'index.html'),
-        path.join(process.cwd(), 'public', 'index.html'),
-      ];
+    // Fetch index.html - always use fetch for reliability in Vercel
+    const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
+    res.setHeader('X-Html-Source', `fetch:${baseUrl}/index.html`);
 
-      let htmlFound = false;
-      for (const htmlPath of possiblePaths) {
-        if (fs.existsSync(htmlPath)) {
-          html = fs.readFileSync(htmlPath, 'utf-8');
-          htmlFound = true;
-          res.setHeader('X-Html-Source', `file:${htmlPath}`);
-          break;
-        }
-      }
+    const htmlResponse = await fetch(`${baseUrl}/index.html`, {
+      headers: {
+        'User-Agent': 'Vercel-Serverless-Function',
+      },
+    });
 
-      if (!htmlFound) {
-        // If file not found, fetch from the deployed site
-        // Use the origin header to avoid circular requests
-        const origin = req.headers.origin || 'https://hawlariza.com';
-        const fetchUrl = `${origin}/index.html`;
-        res.setHeader('X-Html-Source', `fetch:${fetchUrl}`);
-
-        const response = await fetch(fetchUrl, {
-          headers: {
-            'User-Agent': 'Vercel-Serverless-Function',
-          },
-        });
-        html = await response.text();
-      }
-    } catch (e) {
-      console.error('Error reading index.html:', e);
-      res.setHeader('X-Html-Error', String(e));
-
-      // Last resort: return a minimal HTML with just the meta tags
-      throw e;
+    if (!htmlResponse.ok) {
+      throw new Error(`Failed to fetch index.html: ${htmlResponse.status}`);
     }
+
+    html = await htmlResponse.text();
 
     // Escape HTML entities in content
     const escapeHtml = (text: string) => {

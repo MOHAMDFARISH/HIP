@@ -1,4 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase connection
+const supabaseUrl = process.env.SUPABASE_URL || 'https://qgcgzoysvxpnjegijmmu.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnY2d6b3lzdnhwbmplZ2lqbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjI0MDksImV4cCI6MjA3MzU5ODQwOX0.xqfhDOi15RQk_LZ8_FEEpyuYZFbFGVLYU7pYjoxLtEY';
+
+// Default fallback metadata
+const DEFAULT_METADATA = {
+  pageUrl: 'https://hawlariza.com/book',
+  pageTitle: 'Heal in Paradise: Order Your Copy | Maldivian Literary Souvenir',
+  pageDescription: 'Order your copy of Heal in Paradise, the first-ever Maldivian literary souvenir. A powerful collection of poetry by Hawla Riza about hope, healing, and island life. Available now.',
+  pageImage: 'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1200/v1760290035/Untitled_design_1_1_gvmxye.png',
+  ogType: 'book',
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const userAgent = req.headers['user-agent'] || '';
@@ -22,6 +36,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Fetch page metadata from database
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const { data: pageData, error: pageError } = await supabase
+      .from('page_metadata')
+      .select('*')
+      .eq('page_slug', 'book')
+      .eq('is_active', true)
+      .single();
+
+    // Use database metadata or fallback to defaults
+    const pageUrl = pageData?.canonical_url || DEFAULT_METADATA.pageUrl;
+    const pageTitle = pageData?.page_title || DEFAULT_METADATA.pageTitle;
+    const pageDescription = pageData?.og_description || DEFAULT_METADATA.pageDescription;
+    const pageImage = pageData?.og_image || DEFAULT_METADATA.pageImage;
+    const ogType = pageData?.og_type || DEFAULT_METADATA.ogType;
+
+    res.setHeader('X-Metadata-Source', pageData ? 'database' : 'default');
+    if (pageError) {
+      res.setHeader('X-DB-Error', pageError.message);
+    }
+
     // For crawlers, fetch and modify the HTML with book-specific OG tags
     const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
     const htmlResponse = await fetch(`${baseUrl}/index.html`, {
@@ -35,12 +70,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     let html = await htmlResponse.text();
-
-    // Book page specific metadata
-    const pageUrl = 'https://hawlariza.com/book';
-    const pageTitle = 'Heal in Paradise: Order Your Copy | Maldivian Literary Souvenir';
-    const pageDescription = 'Order your copy of Heal in Paradise, the first-ever Maldivian literary souvenir. A powerful collection of poetry by Hawla Riza about hope, healing, and island life. Available now.';
-    const pageImage = 'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1200/v1760290035/Untitled_design_1_1_gvmxye.png'; // Book cover image
 
     // Replace meta tags with book page-specific ones
     html = html
@@ -62,7 +91,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Update Open Graph type
       .replace(
         /<meta property="og:type" content="[^"]*".*?>/,
-        `<meta property="og:type" content="book" />`
+        `<meta property="og:type" content="${ogType}" />`
       )
       // Update Open Graph URL
       .replace(

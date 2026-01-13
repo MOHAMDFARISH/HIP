@@ -75,22 +75,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!post) {
       console.error('Blog post not found for slug:', slug);
+      console.error('Supabase error details:', supabaseError);
 
-      // For crawlers, return index.html with default tags
-      const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
-      const htmlResponse = await fetch(`${baseUrl}/index.html`);
-      const html = await htmlResponse.text();
+      // CRITICAL: For crawlers, DO NOT return homepage tags
+      // This causes wrong OG tags to be scraped
+      // Instead, return a proper 404 or redirect
 
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      // Log for debugging
       res.setHeader('X-Post-Found', 'no');
-      res.setHeader('X-Error', `Post not found for slug: ${slug}`);
+      res.setHeader('X-Requested-Slug', slug);
       if (supabaseError) {
-        // Sanitize header value: remove newlines and control characters
         const sanitizedError = supabaseError.replace(/[\r\n\t]/g, ' ').replace(/[^\x20-\x7E]/g, '');
         res.setHeader('X-Supabase-Error', sanitizedError);
       }
 
-      return res.status(200).send(html);
+      // Return 404 instead of homepage content
+      return res.status(404).send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Blog Post Not Found</title>
+          <meta property="og:title" content="Blog Post Not Found" />
+        </head>
+        <body>
+          <h1>Blog Post Not Found</h1>
+          <p>The blog post "${slug}" could not be found.</p>
+          <p>This might be because:</p>
+          <ul>
+            <li>The post hasn't been published yet (is_published = false)</li>
+            <li>The slug in the URL doesn't match the database slug</li>
+            <li>The post was deleted</li>
+          </ul>
+          <p><a href="/blog">← Back to Blog</a></p>
+        </body>
+        </html>
+      `);
     }
 
     // Post was found - prepare meta tags

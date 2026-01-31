@@ -15,46 +15,66 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq('is_published', true)
       .order('published_date', { ascending: false });
 
-    // Generate blog post URLs
+    // Generate blog post URLs with enhanced metadata
     const blogPostUrls = (blogPosts || [])
       .filter(post => !post.is_external) // Only include internal blog posts in sitemap
       .map(post => {
         const lastmod = post.updated_date || post.published_date;
         const formattedDate = new Date(lastmod).toISOString().split('T')[0];
+
+        // Determine priority based on recency
+        const publishedDate = new Date(post.published_date);
+        const daysSincePublished = (Date.now() - publishedDate.getTime()) / (1000 * 60 * 60 * 24);
+        const priority = daysSincePublished < 30 ? 0.8 : daysSincePublished < 90 ? 0.7 : 0.6;
+
         return `  <url>
     <loc>https://hawlariza.com/blog/${post.slug}</loc>
     <lastmod>${formattedDate}</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>${priority}</priority>
   </url>`;
       })
       .join('\n');
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   <url>
     <loc>https://hawlariza.com/</loc>
-    <lastmod>2025-10-12</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://hawlariza.com/book</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://hawlariza.com/author</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://hawlariza.com/heal-in-paradise</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://hawlariza.com/order-heal-in-paradise</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://hawlariza.com/about-hawla-riza</loc>
-    <lastmod>2025-10-12</lastmod>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://hawlariza.com/blog</loc>

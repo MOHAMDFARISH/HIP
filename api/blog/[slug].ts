@@ -146,6 +146,79 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const safeTitle = escapeHtml(post.title);
     const safeDescription = escapeHtml(post.meta_description);
 
+    // Generate Article structured data (JSON-LD) for SEO and AI search
+    const articleSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: post.title,
+      description: post.meta_description,
+      image: shareImage,
+      author: {
+        '@type': 'Person',
+        name: post.author || 'Hawla Riza',
+        url: 'https://hawlariza.com/author',
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Heal in Paradise',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1200/v1760290035/Untitled_design_1_1_gvmxye.png',
+        },
+      },
+      datePublished: post.published_date,
+      dateModified: post.updated_at || post.published_date,
+      url: postUrl,
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': postUrl,
+      },
+      ...(post.tags && post.tags.length > 0 && { keywords: post.tags.join(', ') }),
+    };
+
+    const breadcrumbSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: 'https://hawlariza.com',
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Blog',
+          item: 'https://hawlariza.com/blog',
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: post.title,
+          item: postUrl,
+        },
+      ],
+    };
+
+    const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(articleSchema)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>`;
+
+    // Enhanced meta tags for AI search
+    const keywords = post.tags ? post.tags.join(', ') : 'poetry, Maldives, mental wellness';
+    const enhancedMeta = `
+    <meta name="keywords" content="${escapeHtml(keywords)}" />
+    <meta name="author" content="${escapeHtml(post.author || 'Hawla Riza')}" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow" />
+    <meta name="article:published_time" content="${post.published_date}" />
+    <meta name="article:modified_time" content="${post.updated_at || post.published_date}" />
+    <meta name="article:author" content="${escapeHtml(post.author || 'Hawla Riza')}" />`;
+
+    // Insert structured data and enhanced meta before </head>
+    html = html.replace('</head>', `${enhancedMeta}\n${jsonLdScript}\n</head>`);
+
     // Replace meta tags with blog post-specific ones
     html = html
       // Update title

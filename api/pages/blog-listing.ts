@@ -71,6 +71,58 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let html = await htmlResponse.text();
 
+    // Generate structured data (JSON-LD) for SEO and AI search
+    const collectionPageSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: pageTitle,
+      description: pageDescription,
+      url: pageUrl,
+      image: pageImage,
+      mainEntity: {
+        '@type': 'Blog',
+        name: 'Heal in Paradise Blog',
+        description: pageDescription,
+        publisher: {
+          '@type': 'Organization',
+          name: 'Heal in Paradise',
+        },
+      },
+    };
+
+    const breadcrumb = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: 'https://hawlariza.com',
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Blog',
+          item: pageUrl,
+        },
+      ],
+    };
+
+    const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(collectionPageSchema)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
+
+    // Enhanced meta tags for AI search
+    const enhancedMeta = `
+    <meta name="keywords" content="Heal in Paradise blog, poetry, Maldivian culture, mental wellness, island life, literature, Hawla Riza" />
+    <meta name="author" content="Hawla Riza" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow" />`;
+
+    // Insert structured data and enhanced meta before </head>
+    html = html.replace('</head>', `${enhancedMeta}\n${jsonLdScript}\n</head>`);
+
     // Replace meta tags with blog listing-specific ones
     html = html
       // Update title

@@ -71,6 +71,74 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let html = await htmlResponse.text();
 
+    // Generate structured data (JSON-LD) for SEO and AI search
+    const organizationSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'Heal in Paradise',
+      description: pageDescription,
+      url: pageUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: pageImage,
+      },
+      founder: {
+        '@type': 'Person',
+        name: 'Hawla Riza',
+      },
+      keywords: 'Maldivian poetry, literary souvenir, mental wellness, island life, Hawla Riza',
+    };
+
+    const webSiteSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      url: pageUrl,
+      name: 'Heal in Paradise',
+      description: pageDescription,
+      publisher: {
+        '@type': 'Organization',
+        name: 'Heal in Paradise',
+      },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${pageUrl}/blog?search={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    };
+
+    const bookSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Book',
+      name: 'Heal in Paradise',
+      author: {
+        '@type': 'Person',
+        name: 'Hawla Riza',
+      },
+      isbn: '978-0-99-702549-1',
+      description: pageDescription,
+      image: pageImage,
+      url: pageUrl,
+    };
+
+    const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(organizationSchema)}</script>
+<script type="application/ld+json">${JSON.stringify(webSiteSchema)}</script>
+<script type="application/ld+json">${JSON.stringify(bookSchema)}</script>`;
+
+    // Enhanced meta tags for AI search
+    const enhancedMeta = `
+    <meta name="keywords" content="Heal in Paradise, Maldivian poetry, Hawla Riza, literary souvenir, mental wellness, island life, Maldives, poetry book, first Maldivian literary souvenir" />
+    <meta name="author" content="Hawla Riza" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow" />
+    <meta name="publisher" content="Heal in Paradise" />`;
+
+    // Insert structured data and enhanced meta before </head>
+    html = html.replace('</head>', `${enhancedMeta}\n${jsonLdScript}\n</head>`);
+
     // Replace meta tags with homepage-specific ones
     html = html
       // Update title

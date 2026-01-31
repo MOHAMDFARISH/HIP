@@ -71,6 +71,59 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let html = await htmlResponse.text();
 
+    // Generate structured data (JSON-LD) for SEO and AI search
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: 'Hawla Riza',
+      description: pageDescription,
+      image: pageImage,
+      url: pageUrl,
+      jobTitle: 'Poet and Author',
+      nationality: 'Maldivian',
+      knowsAbout: ['Poetry', 'Creative Writing', 'Maldivian Literature', 'Mental Wellness'],
+      sameAs: [
+        'https://hawlariza.com',
+      ],
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': pageUrl,
+      },
+    };
+
+    const breadcrumb = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: 'https://hawlariza.com',
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Author',
+          item: pageUrl,
+        },
+      ],
+    };
+
+    const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
+
+    // Enhanced meta tags for AI search
+    const enhancedMeta = `
+    <meta name="keywords" content="Hawla Riza, Maldivian poet, Maldivian author, poetry, creative writing, Heal in Paradise author" />
+    <meta name="author" content="Hawla Riza" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow" />`;
+
+    // Insert structured data and enhanced meta before </head>
+    html = html.replace('</head>', `${enhancedMeta}\n${jsonLdScript}\n</head>`);
+
     // Replace meta tags with author page-specific ones
     html = html
       // Update title

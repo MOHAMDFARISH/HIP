@@ -71,6 +71,69 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let html = await htmlResponse.text();
 
+    // Generate structured data (JSON-LD) for SEO and AI search
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'Book',
+      name: 'Heal in Paradise',
+      author: {
+        '@type': 'Person',
+        name: 'Hawla Riza',
+        url: 'https://hawlariza.com/author',
+      },
+      isbn: '978-0-99-702549-1',
+      description: pageDescription,
+      image: pageImage,
+      url: pageUrl,
+      publisher: {
+        '@type': 'Organization',
+        name: 'Heal in Paradise',
+      },
+      inLanguage: 'en',
+      genre: ['Poetry', 'Maldivian Literature', 'Self-Help'],
+      keywords: 'Maldivian poetry, Heal in Paradise, Hawla Riza, island life, mental wellness, literary souvenir, Maldives',
+      offers: {
+        '@type': 'Offer',
+        availability: 'https://schema.org/InStock',
+        price: 'Contact for pricing',
+        priceCurrency: 'USD',
+      },
+    };
+
+    const breadcrumb = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: 'https://hawlariza.com',
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Book',
+          item: pageUrl,
+        },
+      ],
+    };
+
+    const jsonLdScript = `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
+
+    // Enhanced meta tags for AI search
+    const enhancedMeta = `
+    <meta name="keywords" content="Maldivian poetry, Heal in Paradise, Hawla Riza, island life, mental wellness, literary souvenir, Maldives, poetry book, first Maldivian literary souvenir" />
+    <meta name="author" content="Hawla Riza" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow" />
+    <meta name="publisher" content="Heal in Paradise" />`;
+
+    // Insert structured data and enhanced meta before </head>
+    html = html.replace('</head>', `${enhancedMeta}\n${jsonLdScript}\n</head>`);
+
     // Replace meta tags with book page-specific ones
     html = html
       // Update title

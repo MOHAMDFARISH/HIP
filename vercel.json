@@ -13,36 +13,12 @@
       "destination": "/api/blog/:slug"
     },
     {
-      "source": "/book",
-      "destination": "/api/pages/book"
-    },
-    {
-      "source": "/author",
-      "destination": "/api/pages/author"
-    },
-    {
-      "source": "/blog",
-      "destination": "/api/pages/blog-listing"
-    },
-    {
-      "source": "/reviews",
-      "destination": "/api/pages/reviews"
-    },
-    {
-      "source": "/media",
-      "destination": "/api/pages/media"
-    },
-    {
-      "source": "/faq",
-      "destination": "/api/pages/faq"
-    },
-    {
-      "source": "/contact",
-      "destination": "/api/pages/contact"
+      "source": "/:page(book|author|blog|reviews|media|faq|contact)",
+      "destination": "/api/pages/:page"
     },
     {
       "source": "/",
-      "destination": "/api/pages/home"
+      "destination": "/api/pages/"
     },
     {
       "source": "/:path((?!api/|.*\\..*).*)",

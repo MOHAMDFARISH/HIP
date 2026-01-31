@@ -25,6 +25,22 @@
       "destination": "/api/pages/blog-listing"
     },
     {
+      "source": "/reviews",
+      "destination": "/api/pages/reviews"
+    },
+    {
+      "source": "/media",
+      "destination": "/api/pages/media"
+    },
+    {
+      "source": "/faq",
+      "destination": "/api/pages/faq"
+    },
+    {
+      "source": "/contact",
+      "destination": "/api/pages/contact"
+    },
+    {
       "source": "/",
       "destination": "/api/pages/home"
     },

@@ -59,6 +59,42 @@ INSERT INTO page_metadata (page_slug, page_title, og_title, og_description, og_i
   'https://res.cloudinary.com/dmtolfhsv/image/upload/v1767116573/george-girnas-6RTn6HZD-RI-unsplash_mmmbm2.jpg',
   'website',
   'https://hawlariza.com/blog'
+),
+(
+  'reviews',
+  'Reviews | Heal in Paradise - Reader Testimonials',
+  'Reviews | Heal in Paradise - Reader Testimonials',
+  'Read what readers are saying about Heal in Paradise. Discover testimonials and reviews from those who have experienced this Maldivian literary souvenir.',
+  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1200/v1760290035/Untitled_design_1_1_gvmxye.png',
+  'website',
+  'https://hawlariza.com/reviews'
+),
+(
+  'media',
+  'Media | Heal in Paradise - Press & Coverage',
+  'Media | Heal in Paradise - Press & Coverage',
+  'Explore media coverage, press releases, and features about Heal in Paradise and Hawla Riza. View interviews, articles, and media appearances.',
+  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1200/v1760290035/Untitled_design_1_1_gvmxye.png',
+  'website',
+  'https://hawlariza.com/media'
+),
+(
+  'faq',
+  'FAQ | Heal in Paradise - Frequently Asked Questions',
+  'FAQ | Heal in Paradise - Frequently Asked Questions',
+  'Find answers to frequently asked questions about Heal in Paradise, ordering, shipping, and more. Get all the information you need about this Maldivian literary souvenir.',
+  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1200/v1760290035/Untitled_design_1_1_gvmxye.png',
+  'website',
+  'https://hawlariza.com/faq'
+),
+(
+  'contact',
+  'Contact | Heal in Paradise - Get in Touch',
+  'Contact | Heal in Paradise - Get in Touch',
+  'Contact Hawla Riza about Heal in Paradise. Reach out for book inquiries, speaking engagements, media requests, or general questions.',
+  'https://res.cloudinary.com/dmtolfhsv/image/upload/f_auto,q_auto,w_1200/v1760290035/Untitled_design_1_1_gvmxye.png',
+  'website',
+  'https://hawlariza.com/contact'
 )
 ON CONFLICT (page_slug) DO NOTHING;
 

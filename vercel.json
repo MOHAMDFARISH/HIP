@@ -18,7 +18,7 @@
     },
     {
       "source": "/",
-      "destination": "/api/pages/"
+      "destination": "/api/pages/home"
     },
     {
       "source": "/:path((?!api/|.*\\..*).*)",

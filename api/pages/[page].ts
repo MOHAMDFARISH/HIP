@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Supabase connection
 const supabaseUrl = process.env.SUPABASE_URL || 'https://qgcgzoysvxpnjegijmmu.supabase.co';
@@ -169,12 +171,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // If not a social media crawler, let the SPA handle it
   if (!isSocialCrawler) {
     try {
-      const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
-      const response = await fetch(`${baseUrl}/index.html`);
-      const html = await response.text();
+      const htmlPath = path.join(process.cwd(), 'index.html');
+      const html = fs.readFileSync(htmlPath, 'utf-8');
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.status(200).send(html);
     } catch (e) {
+      console.error('Error reading index.html for non-crawler:', e);
       return res.redirect(307, '/');
     }
   }
@@ -200,17 +202,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.setHeader('X-DB-Error', pageError.message);
     }
 
-    // Fetch base HTML
-    const baseUrl = `https://${req.headers.host || 'hawlariza.com'}`;
-    const htmlResponse = await fetch(`${baseUrl}/index.html`, {
-      headers: { 'User-Agent': 'Vercel-Serverless-Function' },
-    });
-
-    if (!htmlResponse.ok) {
-      throw new Error(`Failed to fetch index.html: ${htmlResponse.status}`);
-    }
-
-    let html = await htmlResponse.text();
+    // Read base HTML from filesystem
+    const htmlPath = path.join(process.cwd(), 'index.html');
+    let html = fs.readFileSync(htmlPath, 'utf-8');
 
     // Generate structured data
     const schemas = generateStructuredData(pageSlug, pageUrl, pageTitle, pageDescription, pageImage);

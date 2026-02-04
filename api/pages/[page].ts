@@ -8,6 +8,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANO
 // Map page paths to database slugs
 const PAGE_MAPPING: Record<string, string> = {
   '': 'home',
+  'home': 'home',
   'book': 'book',
   'author': 'author',
   'blog': 'blog',
